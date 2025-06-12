@@ -1,3 +1,14 @@
 spring:
   application:
-    name:   eshop-auth-service
+    name: eshop-auth-service
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+server:
+  port: 8081
