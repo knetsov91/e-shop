@@ -1,0 +1,8 @@
+api:
+  insecure: true
+
+providers:
+  consulCatalog:
+    endpoint:
+      address: "localhost:8500"
+    watch: true
