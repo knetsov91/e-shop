@@ -8,3 +8,9 @@ services:
       - "8080:8080"
     volumes:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+
+  consul:
+    container_name: consul
+    image: hashicorp/consul
+    ports:
+      - "8500:8500"
