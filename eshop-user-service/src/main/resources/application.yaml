@@ -10,6 +10,9 @@ spring:
         enabled: false
       discovery:
         enabled: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        instance-id: ${spring.application.name}:${random.value}
 server:
   port: 8081
 
