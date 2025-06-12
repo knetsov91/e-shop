@@ -1,8 +1,13 @@
+entryPoints:
+  web:
+    address: ":80" 
+
 api:
   insecure: true
 
 providers:
   consulCatalog:
+    exposedByDefault: false
     endpoint:
-      address: "localhost:8500"
+      address: "consul:8500"
     watch: true
