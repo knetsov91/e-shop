@@ -4,9 +4,9 @@ WORKDIR /app
 
 COPY . .
 
-RUN chmod +x ./gradlew build
+RUN chmod +x ./gradlew
 
-RUN ./gradlew
+RUN ./gradlew build
 
 FROM amazoncorretto:21-alpine-jdk
 
