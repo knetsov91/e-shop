@@ -20,6 +20,12 @@ spring:
         register: true
 server:
   port: 8081
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          consul: DEBUG
 
 management:
   endpoints:
