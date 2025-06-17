@@ -3,6 +3,8 @@ version: '3.7'
 services:
   traefik:
     image: traefik:v3.4
+    depends_on:
+      - consul
     ports:
       - "80:80"
       - "8080:8080"
