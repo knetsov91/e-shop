@@ -13,6 +13,11 @@ spring:
         health-check-path: /actuator/health
         health-check-interval: 10s
         instance-id: ${spring.application.name}:${random.value}
+        tags:
+          - traefik.enable=true
+          - traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/users`)
+          - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8081
+        register: true
 server:
   port: 8081
 
