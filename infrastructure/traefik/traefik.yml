@@ -11,3 +11,6 @@ providers:
     endpoint:
       address: "consul:8500"
     watch: true
+
+log:
+  level: DEBUG
