@@ -26,4 +26,4 @@ services:
       - CONSUL_URL=consul
       - USER_SERVICE_URL=user-service
     ports:
-      - "8081:8081"
+      - "8081"
