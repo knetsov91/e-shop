@@ -20,5 +20,7 @@ services:
   user-service:
     container_name: eshop-user-service
     build: ../eshop-user-service
+    depends_on:
+      - consul
     ports:
       - "8081:8081"
