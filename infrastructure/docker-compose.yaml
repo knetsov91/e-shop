@@ -18,8 +18,9 @@ services:
       - "8500:8500"
 
   user-service:
-    container_name: eshop-user-service
-    build: ../eshop-user-service
+    image: eshop-user-service
+    build:
+      context: ../eshop-user-service
     depends_on:
       - consul
     environment:
