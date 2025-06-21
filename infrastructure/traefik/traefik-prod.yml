@@ -14,3 +14,6 @@ providers:
 
 log:
   level: DEBUG
+
+accessLog:
+  filePath: "./logs/access.log"
