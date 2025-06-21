@@ -1,0 +1,19 @@
+entryPoints:
+  web:
+    address: ":80" 
+
+api:
+  insecure: true
+
+providers:
+  consulCatalog:
+    exposedByDefault: false
+    endpoint:
+      address: "localhost:8500"
+    watch: true
+
+log:
+  level: DEBUG
+
+accessLog:
+  filePath: "./logs/access.log"
