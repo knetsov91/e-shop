@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  user-service-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVICE_DB}
+    env_file: ".env"
+    volumes:
+      - user_service_db:/var/lib/postgresql/data
+      - ./sql/user_service:/docker-entrypoint-initdb.d
+
+  order-service-db:
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${ORDER_SERVICE_DB}
+    env_file: ".env"
+    volumes:
+      - order_service_db:/var/lib/postgresql/data
+      - ./sql/order_service:/docker-entrypoint-initdb.d
+
+  traefik:
+    image: traefik:v3.4
+    network_mode: host
+    depends_on:
+      - consul
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./logs:/logs
+
+  consul:
+    container_name: consul
+    image: hashicorp/consul
+    network_mode: host
+    
+volumes:
+  user_service_db:
+  order_service_db:
