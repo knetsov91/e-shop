@@ -1,6 +1,18 @@
 spring:
   application:
     name: eshop-auth-service
+  jpa:
+    properties:
+      hibernate:
+        dialect:  org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:${USER_SERVICE_DB_PORT}/${USER_SERVICE_DB}
+    username: ${USER_SERVICE_DB_USERNAME}
+    password: ${USER_SERVICE_DB_PASSWORD}
 
   cloud:
     consul:
