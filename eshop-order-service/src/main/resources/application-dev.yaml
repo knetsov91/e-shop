@@ -1,8 +1,28 @@
 spring:
   application:
     name: eshop-order-service
+
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+        health-check-path: /actuator/health
+        register: true
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${random.value}
+        tags:
+          - traefik.enable=true
+          - traefik.http.routers.eshop-order-service.rule=PathPrefix(`/api/v1/orders`)
+          - traefik.http.services.eshop-order-service.loadbalancer.server.port=8082
+
 server:
   port: 8082
+
+
 
 management:
   endpoints:
