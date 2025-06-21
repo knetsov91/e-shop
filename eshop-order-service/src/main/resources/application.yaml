@@ -3,3 +3,9 @@ spring:
     name: eshop-order-service
 server:
   port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        exclude: health
