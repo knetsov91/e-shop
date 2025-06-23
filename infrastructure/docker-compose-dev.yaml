@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       POSTGRES_DB: ${USER_SERVICE_DB}
-    env_file: ".env"
+    env_file: "dev.env"
     volumes:
       - user_service_db:/var/lib/postgresql/data
       - ./sql/user_service:/docker-entrypoint-initdb.d
@@ -20,7 +20,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
       POSTGRES_DB: ${ORDER_SERVICE_DB}
-    env_file: ".env"
+    env_file: "dev.env"
     volumes:
       - order_service_db:/var/lib/postgresql/data
       - ./sql/order_service:/docker-entrypoint-initdb.d
@@ -45,6 +45,14 @@ services:
       - eshop_prometheus:/prometheus
       - ./dev/prometheus/:/etc/prometheus/
     network_mode: host
+
+  order-service-query-db:
+    image: mongo
+    environment:
+       MONGO_INITDB_ROOT_USERNAME: ${ORDER_SERVICE_QUERY_DB_USERNAME}
+       MONGO_INITDB_ROOT_PASSWORD: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+    ports:
+      - "27017:27017"
 
 volumes:
   user_service_db:
