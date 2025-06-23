@@ -2,6 +2,10 @@ spring:
   application:
     name: eshop-order-service
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: order-group
   jpa:
     show-sql: true
     properties:
