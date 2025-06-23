@@ -54,6 +54,10 @@ services:
     ports:
       - "27017:27017"
 
+  kafka:
+    image: apache/kafka
+    ports:
+      - "9092:9092"
 volumes:
   user_service_db:
   order_service_db:
