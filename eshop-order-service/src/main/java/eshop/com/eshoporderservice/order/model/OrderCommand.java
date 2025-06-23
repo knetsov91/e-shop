@@ -1,9 +1,12 @@
 package eshop.com.eshoporderservice.order.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 import java.util.UUID;
 
+@Data
 @Entity
+@Table(name="orders")
 public class OrderCommand {
 
     @Id
@@ -18,4 +21,7 @@ public class OrderCommand {
 
     @Column
     private String status;
+
+
+
 }
