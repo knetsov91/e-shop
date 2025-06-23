@@ -1,6 +1,18 @@
 spring:
   application:
     name: eshop-auth-service
+  jpa:
+    properties:
+      hibernate:
+        dialect:  org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:${USER_SERVICE_DB_PORT}/${USER_SERVICE_DB}
+    username: ${USER_SERVICE_DB_USERNAME}
+    password: ${USER_SERVICE_DB_PASSWORD}
 
   cloud:
     consul:
@@ -15,7 +27,7 @@ spring:
         instance-id: ${spring.application.name}:${random.value}
         tags:
           - traefik.enable=true
-          - traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/users`)
+          - traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/api/v1/users`)
           - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8081
         register: true
         prefer-ip-address: true
@@ -32,4 +44,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health"
+        include: health, httpexchanges
