@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @AllArgsConstructor
-@Document(collation = "orders")
+@Document(collection = "orders")
 public class OrderQuery {
 
     @Id
