@@ -7,3 +7,5 @@ spring:
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
       authentication-database: admin
       database: products
+server:
+  port: 8084
