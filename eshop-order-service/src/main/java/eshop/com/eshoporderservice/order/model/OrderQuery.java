@@ -1,8 +1,10 @@
 package eshop.com.eshoporderservice.order.model;
 
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@AllArgsConstructor
 @Document(collation = "orders")
 public class OrderQuery {
 
