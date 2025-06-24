@@ -2,6 +2,12 @@ spring:
   application:
     name: eshop-order-service
 
+  data:
+    mongodb:
+      database: orders
+      username:  ${ORDER_SERVICE_QUERY_DB_USERNAME}
+      authentication-database: admin
+      password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
