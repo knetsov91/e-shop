@@ -2,10 +2,9 @@ package eshop.com.eshopproductservice.web;
 
 import eshop.com.eshopproductservice.model.Product;
 import eshop.com.eshopproductservice.service.ProductService;
+import eshop.com.eshopproductservice.web.dto.ProductCreateRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
@@ -23,5 +22,10 @@ public class ProductController {
         List<Product> products = productService.getProducts();
 
         return ResponseEntity.ok(products);
+    }
+    @PostMapping
+    public ResponseEntity<?> createProduct(@RequestBody ProductCreateRequest productCreateRequest) {
+        productService.createProduct(productCreateRequest);
+        return ResponseEntity.status(201).build();
     }
 }
