@@ -1,13 +1,23 @@
 package eshop.com.eshopproductservice.web.dto;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 public class ProductCreateRequest {
 
+    @NotEmpty(message = "Name is required")
+    @Size(min = 2)
     private String name;
 
+    @NotEmpty(message = "Description is required")
+    @Size(min = 3)
     private String description;
 
+    @Positive(message = "Price must be positive")
     private double price;
 
+    @Positive(message = "Quantity must be positive")
     private int quantity;
 
     public String getName() {
