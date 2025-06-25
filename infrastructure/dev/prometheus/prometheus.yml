@@ -7,6 +7,8 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: eshop_user_service
+  - job_name: eshop_product_service
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 15s
     static_configs:
-      - targets: ['localhost:8081']  
+      - targets: ['localhost:8084']  
