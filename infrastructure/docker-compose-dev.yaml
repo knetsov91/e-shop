@@ -99,3 +99,7 @@ volumes:
   order_service_db:
   eshop_prometheus:
   eshop_elasticsearch_data:
+
+networks:
+  elastic:
+    driver: bridge
