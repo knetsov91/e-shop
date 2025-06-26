@@ -89,6 +89,10 @@ services:
     image: docker.elastic.co/kibana/kibana:8.18.2
     depends_on:
       - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS:https://elasticsearch:9200
+    volumes:
+      - eshop_kibana_data:/usr/share/kibana/data
     ports:
       - "5601:5601"
 
