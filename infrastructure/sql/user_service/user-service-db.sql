@@ -1,1 +1,1 @@
-CREATE TABLE users;
+CREATE DATABASE users;
