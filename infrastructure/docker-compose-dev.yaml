@@ -11,13 +11,23 @@ services:
     env_file: "dev.env"
     volumes:
       - user_service_db:/var/lib/postgresql/data
-      - ./sql/user_service:/docker-entrypoint-initdb.d
+      # - ./sql/user_service:/docker-entrypoint-initdb.d
     logging:
       driver: fluentd
       options:
         fluentd-address: fluent-bit:24224
         fluentd-async: "true"
 
+  user-service-db-exporter:
+    image: bitnami/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgres://${USER_SERVICE_DB_USERNAME}:${USER_SERVICE_DB_PASSWORD}@${user-service-db}/${USER_SERVICE_DB}?sslmode=disabled"
+    depends_on:
+      user-service-db:
+        condition: service_started
+        
   order-service-db:
     image: postgres
     ports:
