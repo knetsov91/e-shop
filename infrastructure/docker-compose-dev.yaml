@@ -12,6 +12,11 @@ services:
     volumes:
       - user_service_db:/var/lib/postgresql/data
       - ./sql/user_service:/docker-entrypoint-initdb.d
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        fluentd-async: "true"
 
   order-service-db:
     image: postgres
