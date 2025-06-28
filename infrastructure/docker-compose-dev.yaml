@@ -23,7 +23,7 @@ services:
     ports:
       - "9187:9187"
     environment:
-      DATA_SOURCE_NAME: "postgres://${USER_SERVICE_DB_USERNAME}:${USER_SERVICE_DB_PASSWORD}@${user-service-db}/${USER_SERVICE_DB}?sslmode=disabled"
+      DATA_SOURCE_NAME: "postgres://${USER_SERVICE_DB_USERNAME}:${USER_SERVICE_DB_PASSWORD}@user-service-db/${USER_SERVICE_DB}?sslmode=disable"
     depends_on:
       user-service-db:
         condition: service_started
