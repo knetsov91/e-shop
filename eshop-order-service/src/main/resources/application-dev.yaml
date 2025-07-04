@@ -2,12 +2,25 @@ spring:
   application:
     name: eshop-order-service
 
+  data:
+    mongodb:
+      database: orders
+      username:  ${ORDER_SERVICE_QUERY_DB_USERNAME}
+      authentication-database: admin
+      password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: order-group
   jpa:
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
         format_sql: true
+    hibernate:
+      ddl-auto: update
 
   datasource:
     driver-class-name: org.postgresql.Driver

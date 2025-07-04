@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: eshop-product-service
+  data:
+    mongodb:
+      username: ${ORDER_SERVICE_QUERY_DB_USERNAME}
+      password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+      authentication-database: admin
+      database: products
+server:
+  port: 8084
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
