@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v3.4
+    depends_on:
+      - consul
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+
+  consul:
+    container_name: consul
+    image: hashicorp/consul
+    ports:
+      - "8500:8500"
+
+  user-service:
+    image: eshop-user-service
+    build: ../eshop-user-service
+    depends_on:
+      - consul
+    environment:
+      - CONSUL_URL=consul
+      - USER_SERVICE_URL=user-service
+    ports:
+      - "8081"
