@@ -21,7 +21,12 @@ Each microservice is implemented as Spring Boot project.
     <li>Kibana</li>
 </ul>
 <h2>Documentations</h2>
-<p>User microservice
-</p>
+<ul>
+    <li>User microservice - <a href="./docs/user-service/README.md">here</a></li>
+    <li>Order microservice - <a href="./docs/order-service/README.md">here</a></li>
+    <li>Product microservice - <a href="./docs/product-service/README.md">here</a></li>
+</ul>
+
+
 <h2>Architecture Diagram</h2>
 <img src="./assets/e-shop-diagram.png" />
