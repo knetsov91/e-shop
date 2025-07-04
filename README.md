@@ -20,6 +20,8 @@ Each microservice is implemented as Spring Boot project.
     <li>Elasticsearch</li>
     <li>Kibana</li>
 </ul>
-
+<h2>Documentations</h2>
+<p>User microservice
+</p>
 <h2>Architecture Diagram</h2>
 <img src="./assets/e-shop-diagram.png" />
