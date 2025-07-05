@@ -67,7 +67,7 @@ services:
     depends_on:
       - consul
     volumes:
-      - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik-test.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
 
   consul:
