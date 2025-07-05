@@ -11,8 +11,23 @@ services:
     env_file: "dev.env"
     volumes:
       - user_service_db:/var/lib/postgresql/data
-      - ./sql/user_service:/docker-entrypoint-initdb.d
+      # - ./sql/user_service:/docker-entrypoint-initdb.d
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        fluentd-async: "true"
 
+  user-service-db-exporter:
+    image: bitnami/postgres-exporter
+    ports:
+      - "9187:9187"
+    environment:
+      DATA_SOURCE_NAME: "postgres://${USER_SERVICE_DB_USERNAME}:${USER_SERVICE_DB_PASSWORD}@user-service-db/${USER_SERVICE_DB}?sslmode=disable"
+    depends_on:
+      user-service-db:
+        condition: service_started
+        
   order-service-db:
     image: postgres
     ports:
@@ -46,6 +61,11 @@ services:
       - ./dev/prometheus/:/etc/prometheus/
     network_mode: host
 
+  grafana:  
+    image: grafana/grafana
+    volumes:
+      - eshop_kibana_data:/var/lib/grafana
+    network_mode: host
   order-service-query-db:
     image: mongo
     environment:
@@ -61,8 +81,6 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry
     hostname: schema-registry
-    depends_on: 
-      - kafka
     ports:
       - "8081:8081"
     environment:
@@ -73,6 +91,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
     container_name: elasticsearch
+    hostname: elasticsearch-node
     environment:
       - discovery.type=single-node 
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -82,24 +101,33 @@ services:
       - "9300:9300"
     volumes:
       - eshop_elasticsearch_data:/usr/share/elasticsearch/data
-    networks:
-      - elastic
+
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.18.2
     depends_on:
       - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS:https://elasticsearch:9200
+    volumes:
+      - eshop_kibana_data:/usr/share/kibana/data
     ports:
-      - "5601:5601"
-    networks:
-      - elastic
+      - "5601:5601" 
+  fluent-bit:
+    image: fluent/fluent-bit
+    container_name: fluent-bit
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./infrastructure/fluent-bit-elastic.conf:/fluent-bit/etc/fluent-bit.conf
 
 volumes:
   user_service_db:
   order_service_db:
   eshop_prometheus:
   eshop_elasticsearch_data:
-
+  eshop_kibana_data:
 networks:
   elastic:
     driver: bridge
