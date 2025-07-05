@@ -24,7 +24,7 @@ spring:
 
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:${ORDER_SERVICE_DB_PORT}/${ORDER_SERVICE_DB}
+    url: jdbc:postgresql://${ORDER_SERVICE_DB_HOST}:${ORDER_SERVICE_DB_PORT}/${ORDER_SERVICE_DB}
     username: ${ORDER_SERVICE_DB_USERNAME}
     password: ${ORDER_SERVICE_DB_PASSWORD}
   cloud:
