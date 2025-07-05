@@ -7,6 +7,19 @@ spring:
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
       authentication-database: admin
       database: products
+  cloud:
+    consul:
+      host: ${CONSUL_URL:localhost}
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        instance-id: ${spring.application.name}:${random.value}
+        register: true
+        prefer-ip-address: true
 server:
   port: 8084
 
