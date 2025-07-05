@@ -6,7 +6,7 @@ services:
     image: user-service.dev
     build:
       context: ../eshop-user-service
-
+      dockerfile: Dockerfile
   user-service-db:
     image: postgres
     ports:
