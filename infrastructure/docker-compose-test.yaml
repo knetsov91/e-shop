@@ -7,6 +7,10 @@ services:
     build:
       context: ../eshop-user-service
       dockerfile: Dockerfile
+    depends_on:
+      - user-service-db
+    env_file: "test.env"
+
   user-service-db:
     image: postgres
     ports:
