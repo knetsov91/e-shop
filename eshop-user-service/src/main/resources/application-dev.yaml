@@ -6,6 +6,8 @@ spring:
       hibernate:
         dialect:  org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+    hibernate:
+      ddl-auto: update
     show-sql: true
 
   datasource:
@@ -28,11 +30,11 @@ spring:
         tags:
           - traefik.enable=true
           - traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/api/v1/users`)
-          - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8081
+          - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8088
         register: true
         prefer-ip-address: true
 server:
-  port: 8081
+  port: 8088
 logging:
   level:
     org:
