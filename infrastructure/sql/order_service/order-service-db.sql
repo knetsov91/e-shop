@@ -1,1 +1,1 @@
-CREATE TABLE orders;
+CREATE DATABASE orders;

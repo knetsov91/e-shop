@@ -22,6 +22,4 @@ public class OrderCommand {
     @Column
     private String status;
 
-
-
 }
