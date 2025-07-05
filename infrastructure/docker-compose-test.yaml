@@ -79,7 +79,7 @@ services:
     image: prom/prometheus
     volumes:
       - eshop_prometheus_dev:/prometheus
-      - ./dev/prometheus/:/etc/prometheus/
+      - ./test/prometheus/:/etc/prometheus/
     ports:
       - "9090:9090"
   grafana:  
