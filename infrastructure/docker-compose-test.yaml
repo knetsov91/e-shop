@@ -53,6 +53,9 @@ services:
 
   traefik:
     image: traefik:v3.4
+    ports:
+      - "8080:8080"
+      - "80:80"
     depends_on:
       - consul
     volumes:
