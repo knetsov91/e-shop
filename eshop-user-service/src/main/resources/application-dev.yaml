@@ -46,4 +46,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, httpexchanges
+        include: health, httpexchanges, prometheus
