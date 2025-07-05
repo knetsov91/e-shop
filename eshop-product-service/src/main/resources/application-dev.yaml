@@ -20,6 +20,10 @@ spring:
         instance-id: ${spring.application.name}:${random.value}
         register: true
         prefer-ip-address: true
+        tags:
+          - traefik.enable=true
+          - traefik.http.routers.eshop-product-service.rule=PathPrefix(`/api/v1/orders`)
+          - traefik.http.services.eshop-product-service.loadbalancer.server.port=8084
 server:
   port: 8084
 
