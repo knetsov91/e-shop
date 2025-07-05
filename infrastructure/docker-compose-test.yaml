@@ -43,6 +43,10 @@ services:
     build:
       context: ../eshop-order-service
       dockerfile: Dockerfile.dev
+    depends_on:
+      - order-service-db
+    env_file: "test.env"
+
   order-service-db:
     image: postgres
     ports:
