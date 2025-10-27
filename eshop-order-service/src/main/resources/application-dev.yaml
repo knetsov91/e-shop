@@ -29,7 +29,7 @@ spring:
     password: ${ORDER_SERVICE_DB_PASSWORD}
   cloud:
     consul:
-      host: ${CONSUL_URL:localhost}
+      host: localhost
       port: 8500
       config:
         enabled: false
