@@ -1,6 +1,12 @@
 version: '3.7'
 
 services:
+
+  user-service:
+    image: user-service.dev
+    build:
+      context: ../eshop-user-service
+
   user-service-db:
     image: postgres
     ports:
@@ -8,9 +14,9 @@ services:
     environment:
       POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
       POSTGRES_DB: ${USER_SERVICE_DB}
-    env_file: "dev.env"
+    env_file: "test.env"
     volumes:
-      - user_service_db:/var/lib/postgresql/data
+      - user_service_db_dev:/var/lib/postgresql/data
       # - ./sql/user_service:/docker-entrypoint-initdb.d
     logging:
       driver: fluentd
@@ -37,12 +43,11 @@ services:
       POSTGRES_DB: ${ORDER_SERVICE_DB}
     env_file: "dev.env"
     volumes:
-      - order_service_db:/var/lib/postgresql/data
-      - ./sql/order_service:/docker-entrypoint-initdb.d
+      - order_service_db_dev:/var/lib/postgresql/data
+      # - ./sql/order_service:/docker-entrypoint-initdb.d
 
   traefik:
     image: traefik:v3.4
-    network_mode: host
     depends_on:
       - consul
     volumes:
@@ -52,20 +57,17 @@ services:
   consul:
     container_name: consul
     image: hashicorp/consul
-    network_mode: host
   
   prometheus:
     image: prom/prometheus
     volumes:
-      - eshop_prometheus:/prometheus
+      - eshop_prometheus_dev:/prometheus
       - ./dev/prometheus/:/etc/prometheus/
-    network_mode: host
-
   grafana:  
     image: grafana/grafana
     volumes:
-      - eshop_kibana_data:/var/lib/grafana
-    network_mode: host
+      - eshop_grafana_data_dev:/var/lib/grafana
+
   order-service-query-db:
     image: mongo
     environment:
@@ -81,8 +83,6 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry
     hostname: schema-registry
-    depends_on: 
-      - kafka
     ports:
       - "8081:8081"
     environment:
@@ -102,7 +102,7 @@ services:
       - "9200:9200"
       - "9300:9300"
     volumes:
-      - eshop_elasticsearch_data:/usr/share/elasticsearch/data
+      - eshop_elasticsearch_data_dev:/usr/share/elasticsearch/data
 
 
   kibana:
@@ -112,7 +112,7 @@ services:
     environment:
       - ELASTICSEARCH_HOSTS:https://elasticsearch:9200
     volumes:
-      - eshop_kibana_data:/usr/share/kibana/data
+      - eshop_kibana_data_dev:/usr/share/kibana/data
     ports:
       - "5601:5601" 
   fluent-bit:
@@ -125,11 +125,9 @@ services:
       - ./infrastructure/fluent-bit-elastic.conf:/fluent-bit/etc/fluent-bit.conf
 
 volumes:
-  user_service_db:
-  order_service_db:
-  eshop_prometheus:
-  eshop_elasticsearch_data:
-  eshop_kibana_data:
-networks:
-  elastic:
-    driver: bridge
+  user_service_db_dev:
+  order_service_db_dev:
+  eshop_prometheus_dev:
+  eshop_elasticsearch_data_dev:
+  eshop_kibana_data_dev:
+  eshop_grafana_data_dev:
