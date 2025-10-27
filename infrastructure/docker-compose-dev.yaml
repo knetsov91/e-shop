@@ -81,6 +81,8 @@ services:
   schema-registry:
     image: confluentinc/cp-schema-registry
     hostname: schema-registry
+    depends_on: 
+      - kafka
     ports:
       - "8081:8081"
     environment:
