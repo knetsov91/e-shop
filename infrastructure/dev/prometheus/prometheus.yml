@@ -12,7 +12,3 @@ scrape_configs:
     scrape_interval: 15s
     static_configs:
       - targets: ['localhost:8084']  
-
-  - job_name: eshop-user-service-db
-    static_configs:
-      - targets: ['localhost:9187']
