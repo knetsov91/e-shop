@@ -27,6 +27,13 @@ services:
         fluentd-async: "true"
 
   
+  order-service:
+    build: ../eshop-user-service
+    image: eshop-order-service
+    env_file: dev.env
+    depends_on:
+      - order-service-db
+
   order-service-db:
     image: postgres
     ports:
