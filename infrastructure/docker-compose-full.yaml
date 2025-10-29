@@ -4,11 +4,15 @@ services:
   order-service:
     build: ../eshop-order-service
     image: eshop-order-service
-    
+    env_file:
+      - full.env
+  
   product-service:
     build: ../eshop-product-service
     image: eshop-product-service
-
+    env_file:
+      - full.env
+  
   mongodb:
       image: mongo
       environment:
