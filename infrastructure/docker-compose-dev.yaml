@@ -35,22 +35,21 @@ services:
       - order-service-db
 
   order-service-db:
-    image: postgres
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
-      POSTGRES_DB: ${ORDER_SERVICE_DB}
-    env_file: "dev.env"
-    volumes:
-      - order_service_db:/var/lib/postgresql/data
-      - ./sql/order_service:/docker-entrypoint-initdb.d
+      image: postgres
+      ports:
+        - "5433:5432"
+      environment:
+        POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+        POSTGRES_DB: ${ORDER_SERVICE_DB}
+      env_file: "dev.env"
+      volumes:
+        - order_service_db:/var/lib/postgresql/data
 
   traefik:
-    image: traefik:v3.4
-    network_mode: host
+    image: traefik:v3.4 
     depends_on:
       - consul
+    network_mode: host
     volumes:
       - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
@@ -60,16 +59,10 @@ services:
     image: hashicorp/consul
     network_mode: host
   
- 
-
-  
-
 volumes:
   user_service_db:
-  order_service_db:
-  eshop_prometheus:
-  eshop_elasticsearch_data:
-  eshop_kibana_data:
+  order_service_db: 
+ 
 networks:
   elastic:
     driver: bridge
