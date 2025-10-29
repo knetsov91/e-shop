@@ -42,7 +42,7 @@ services:
     depends_on:
       - consul
     volumes:
-      - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik-full.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
     ports:
       - "80:80"
