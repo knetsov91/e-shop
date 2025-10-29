@@ -25,7 +25,8 @@ services:
       environment:
          MONGO_INITDB_ROOT_USERNAME: ${ORDER_SERVICE_QUERY_DB_USERNAME}
          MONGO_INITDB_ROOT_PASSWORD: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
-
+      ports:
+        - "27017:27017"
   order-service-db:
       image: postgres
       ports:
