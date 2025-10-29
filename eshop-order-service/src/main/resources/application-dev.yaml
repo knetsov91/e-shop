@@ -8,6 +8,7 @@ spring:
       username:  ${ORDER_SERVICE_QUERY_DB_USERNAME}
       authentication-database: admin
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+      host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
