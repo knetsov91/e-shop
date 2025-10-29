@@ -1,0 +1,58 @@
+version: '3.7'
+
+services:
+  order-service:
+    build: ../eshop-order-service
+    image: eshop-order-service
+    env_file:
+      - full.env
+    depends_on:
+      - consul
+      - order-service-db
+      - mongodb
+
+  product-service:
+    build: ../eshop-product-service
+    image: eshop-product-service
+    env_file:
+      - full.env
+    depends_on:
+      - consul
+      - mongodb
+
+  mongodb:
+      image: mongo
+      environment:
+         MONGO_INITDB_ROOT_USERNAME: ${ORDER_SERVICE_QUERY_DB_USERNAME}
+         MONGO_INITDB_ROOT_PASSWORD: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+      ports:
+        - "27017:27017"
+  order-service-db:
+      image: postgres
+      ports:
+        - "5433:5432"
+      environment:
+        POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+        POSTGRES_DB: ${ORDER_SERVICE_DB}
+      volumes:
+        - order_service_db:/var/lib/postgresql/data
+  
+  traefik:
+    image: traefik:v3.4 
+    depends_on:
+      - consul
+    volumes:
+      - ./traefik/traefik-full.yml:/etc/traefik/traefik.yml
+      - ./logs:/logs
+    ports:
+      - "80:80"
+      - "8080:8080"
+  consul:
+    container_name: consul
+    image: hashicorp/consul
+    ports:
+      - "8500:8500"
+  
+volumes:
+  user_service_db:
+  order_service_db: 

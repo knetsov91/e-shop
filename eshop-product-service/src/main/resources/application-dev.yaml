@@ -7,6 +7,7 @@ spring:
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
       authentication-database: admin
       database: products
+      host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
   cloud:
     consul:
       host: ${CONSUL_URL:localhost}

@@ -6,7 +6,7 @@ COPY . .
 
 RUN chmod +x ./gradlew
 
-RUN ./gradlew build
+RUN --mount=type=cache,target=/root/.gradle  ./gradlew build
 
 FROM amazoncorretto:21-alpine
 
