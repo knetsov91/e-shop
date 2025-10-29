@@ -30,6 +30,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 dependencyManagement {

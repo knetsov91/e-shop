@@ -6,6 +6,10 @@ services:
     image: user-service.dev
     build:
       context: ../eshop-user-service
+      dockerfile: Dockerfile
+    depends_on:
+      - user-service-db
+    env_file: "test.env"
 
   user-service-db:
     image: postgres
@@ -33,7 +37,16 @@ services:
     depends_on:
       user-service-db:
         condition: service_started
-        
+  
+  order-service:
+    image: order-service.dev
+    build:
+      context: ../eshop-order-service
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - order-service-db
+    env_file: "test.env"
+
   order-service-db:
     image: postgres
     ports:
@@ -48,21 +61,27 @@ services:
 
   traefik:
     image: traefik:v3.4
+    ports:
+      - "8080:8080"
+      - "80:80"
     depends_on:
       - consul
     volumes:
-      - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik-test.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
 
   consul:
     container_name: consul
     image: hashicorp/consul
-  
+    ports:
+      - "8500:8500"
   prometheus:
     image: prom/prometheus
     volumes:
       - eshop_prometheus_dev:/prometheus
-      - ./dev/prometheus/:/etc/prometheus/
+      - ./test/prometheus/:/etc/prometheus/
+    ports:
+      - "9090:9090"
   grafana:  
     image: grafana/grafana
     volumes:
