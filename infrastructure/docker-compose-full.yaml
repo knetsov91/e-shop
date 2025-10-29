@@ -19,7 +19,7 @@ services:
     depends_on:
       - consul
       - mongodb
-      
+
   mongodb:
       image: mongo
       environment:
@@ -43,10 +43,14 @@ services:
     volumes:
       - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
-  
+    ports:
+      - "80:80"
+      - "8080:8080"
   consul:
     container_name: consul
     image: hashicorp/consul
+    ports:
+      - "8500:8500"
   
 volumes:
   user_service_db:
