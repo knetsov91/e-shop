@@ -1,14 +1,39 @@
 version: '3.7'
 
 services:
-  mongodb:
-      image: mongo
-      environment:
-         MONGO_INITDB_ROOT_USERNAME: ${ORDER_SERVICE_QUERY_DB_USERNAME}
-         MONGO_INITDB_ROOT_PASSWORD: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
-      env_file: dev.env
-      ports:
-        - "27017:27017"
+
+  user-service:
+    build: ../eshop-user-service
+    image: eshop-user-service
+    env_file: dev.env
+    depends_on:
+      - user-service-db
+
+  user-service-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVICE_DB}
+    env_file: "dev.env"
+    volumes:
+      - user_service_db:/var/lib/postgresql/data
+      # - ./sql/user_service:/docker-entrypoint-initdb.d
+    logging:
+      driver: fluentd
+      options:
+        fluentd-address: fluent-bit:24224
+        fluentd-async: "true"
+
+  
+  order-service:
+    build: ../eshop-user-service
+    image: eshop-order-service
+    env_file: dev.env
+    depends_on:
+      - order-service-db
+
   order-service-db:
       image: postgres
       ports:

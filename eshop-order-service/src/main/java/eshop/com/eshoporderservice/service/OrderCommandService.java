@@ -2,7 +2,6 @@ package eshop.com.eshoporderservice.service;
 
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
-import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -18,12 +17,8 @@ public class OrderCommandService {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public OrderCommand createOrder(OrderCommandCreateRequest orderCommand) {
-        OrderCommand orderCommandEntity = new OrderCommand();
-        orderCommand.setProduct(orderCommand.getProduct());
-        orderCommand.setQuantity(orderCommand.getQuantity());
-
-        OrderCommand save = orderCommandRepository.save(orderCommandEntity);
+    public OrderCommand createOrder(OrderCommand orderCommand) {
+        OrderCommand save = orderCommandRepository.save(orderCommand);
         kafkaTemplate.send("order-events", "OrderCreated:%s".formatted(save.getId()));
         return save;
     }
