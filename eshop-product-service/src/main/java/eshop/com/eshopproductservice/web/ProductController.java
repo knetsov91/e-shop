@@ -3,6 +3,7 @@ package eshop.com.eshopproductservice.web;
 import eshop.com.eshopproductservice.model.Product;
 import eshop.com.eshopproductservice.service.ProductService;
 import eshop.com.eshopproductservice.web.dto.ProductCreateRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
     @PostMapping
-    public ResponseEntity<?> createProduct(@RequestBody ProductCreateRequest productCreateRequest) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductCreateRequest productCreateRequest) {
         productService.createProduct(productCreateRequest);
         return ResponseEntity.status(201).build();
     }
