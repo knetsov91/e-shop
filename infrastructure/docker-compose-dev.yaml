@@ -1,56 +1,30 @@
 version: '3.7'
 
 services:
-
-  user-service:
-    build: ../eshop-user-service
-    image: eshop-user-service
-    env_file: dev.env
-    depends_on:
-      - user-service-db
-
-  user-service-db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
-      POSTGRES_DB: ${USER_SERVICE_DB}
-    env_file: "dev.env"
-    volumes:
-      - user_service_db:/var/lib/postgresql/data
-      # - ./sql/user_service:/docker-entrypoint-initdb.d
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: fluent-bit:24224
-        fluentd-async: "true"
-
-  
-  order-service:
-    build: ../eshop-user-service
-    image: eshop-order-service
-    env_file: dev.env
-    depends_on:
-      - order-service-db
-
+  mongodb:
+      image: mongo
+      environment:
+         MONGO_INITDB_ROOT_USERNAME: ${ORDER_SERVICE_QUERY_DB_USERNAME}
+         MONGO_INITDB_ROOT_PASSWORD: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
+      env_file: dev.env
+      ports:
+        - "27017:27017"
   order-service-db:
-    image: postgres
-    ports:
-      - "5433:5432"
-    environment:
-      POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
-      POSTGRES_DB: ${ORDER_SERVICE_DB}
-    env_file: "dev.env"
-    volumes:
-      - order_service_db:/var/lib/postgresql/data
-      - ./sql/order_service:/docker-entrypoint-initdb.d
+      image: postgres
+      ports:
+        - "5433:5432"
+      environment:
+        POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+        POSTGRES_DB: ${ORDER_SERVICE_DB}
+      env_file: "dev.env"
+      volumes:
+        - order_service_db:/var/lib/postgresql/data
 
   traefik:
-    image: traefik:v3.4
-    network_mode: host
+    image: traefik:v3.4 
     depends_on:
       - consul
+    network_mode: host
     volumes:
       - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
@@ -60,16 +34,10 @@ services:
     image: hashicorp/consul
     network_mode: host
   
- 
-
-  
-
 volumes:
   user_service_db:
-  order_service_db:
-  eshop_prometheus:
-  eshop_elasticsearch_data:
-  eshop_kibana_data:
+  order_service_db: 
+ 
 networks:
   elastic:
     driver: bridge
