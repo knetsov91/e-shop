@@ -6,13 +6,20 @@ services:
     image: eshop-order-service
     env_file:
       - full.env
-  
+    depends_on:
+      - consul
+      - order-service-db
+      - mongodb
+
   product-service:
     build: ../eshop-product-service
     image: eshop-product-service
     env_file:
       - full.env
-  
+    depends_on:
+      - consul
+      - mongodb
+      
   mongodb:
       image: mongo
       environment:
