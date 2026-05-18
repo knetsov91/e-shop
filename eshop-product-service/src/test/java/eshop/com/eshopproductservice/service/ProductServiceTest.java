@@ -23,7 +23,7 @@ class ProductServiceTest {
     private ProductService productService;
 
     @Test
-    void getProducts_happyPath_returnsAllProducts() {
+    void getProducts_whenProductsExist_thenReturnsAllProducts() {
         Product product = new Product();
         product.setName("Laptop");
         product.setPrice(999.99);
@@ -34,5 +34,14 @@ class ProductServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getName()).isEqualTo("Laptop");
+    }
+
+    @Test
+    void getProducts_whenNoProducts_thenReturnsEmptyList() {
+        when(productRepository.findAll()).thenReturn(List.of());
+
+        List<Product> result = productService.getProducts();
+
+        assertThat(result).isEmpty();
     }
 }
