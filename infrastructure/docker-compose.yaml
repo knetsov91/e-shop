@@ -1,6 +1,9 @@
 version: '3.7'
 
 services:
+
+  # --- Infrastructure ---
+
   traefik:
     image: traefik:v3.4
     depends_on:
@@ -9,7 +12,8 @@ services:
       - "80:80"
       - "8080:8080"
     volumes:
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml
+      - ./traefik/traefik-prod.yml:/etc/traefik/traefik.yml
+      - ./logs:/logs
 
   consul:
     container_name: consul
@@ -17,13 +21,140 @@ services:
     ports:
       - "8500:8500"
 
+  kafka:
+    image: apache/kafka
+    ports:
+      - "9092:9092"
+
+  # --- Databases ---
+
+  user-service-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${USER_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVICE_DB}
+    volumes:
+      - user_service_db:/var/lib/postgresql/data
+
+  order-service-db:
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${ORDER_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${ORDER_SERVICE_DB}
+    volumes:
+      - order_service_db:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+
+  # --- Services ---
+
   user-service:
-    image: eshop-user-service
     build: ../eshop-user-service
+    image: eshop-user-service
+    env_file: .env
     depends_on:
       - consul
+      - user-service-db
     environment:
       - CONSUL_URL=consul
-      - USER_SERVICE_URL=user-service
+      - USER_SERVICE_DB_HOST=user-service-db
+      - USER_SERVICE_DB_PORT=5432
+
+  product-service:
+    build: ../eshop-product-service
+    image: eshop-product-service
+    env_file: .env
+    depends_on:
+      - consul
+      - mongodb
+    environment:
+      - CONSUL_URL=consul
+      - ORDER_SERVICE_QUERY_DB_HOST=mongodb
+
+  order-service:
+    build: ../eshop-order-service
+    image: eshop-order-service
+    env_file: .env
+    depends_on:
+      - consul
+      - order-service-db
+      - mongodb
+      - kafka
+    environment:
+      - CONSUL_URL=consul
+      - ORDER_SERVICE_DB_HOST=order-service-db
+      - ORDER_SERVICE_DB_PORT=5432
+      - ORDER_SERVICE_QUERY_DB_HOST=mongodb
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
+  # --- Observability ---
+
+  prometheus:
+    image: prom/prometheus
     ports:
-      - "8081"
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.18.2
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    volumes:
+      - kibana_data:/usr/share/kibana/data
+
+  fluent-bit:
+    image: fluent/fluent-bit
+    container_name: fluent-bit
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+
+volumes:
+  user_service_db:
+  order_service_db:
+  mongodb_data:
+  prometheus_data:
+  grafana_data:
+  elasticsearch_data:
+  kibana_data:

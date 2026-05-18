@@ -2,54 +2,15 @@ version: '3.7'
 
 services:
 
-  user-service:
-    build: ../eshop-user-service
-    image: eshop-user-service
-    env_file: dev.env
-    depends_on:
-      - user-service-db
-
-  user-service-db:
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
-      POSTGRES_DB: ${USER_SERVICE_DB}
-    env_file: "dev.env"
-    volumes:
-      - user_service_db:/var/lib/postgresql/data
-      # - ./sql/user_service:/docker-entrypoint-initdb.d
-    logging:
-      driver: fluentd
-      options:
-        fluentd-address: fluent-bit:24224
-        fluentd-async: "true"
-
-  
-  order-service:
-    build: ../eshop-user-service
-    image: eshop-order-service
-    env_file: dev.env
-    depends_on:
-      - order-service-db
-
-  order-service-db:
-      image: postgres
-      ports:
-        - "5433:5432"
-      environment:
-        POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
-        POSTGRES_DB: ${ORDER_SERVICE_DB}
-      env_file: "dev.env"
-      volumes:
-        - order_service_db:/var/lib/postgresql/data
+  # --- Infrastructure ---
 
   traefik:
-    image: traefik:v3.4 
+    image: traefik:v3.4
     depends_on:
       - consul
-    network_mode: host
+    ports:
+      - "80:80"
+      - "8080:8080"
     volumes:
       - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
       - ./logs:/logs
@@ -57,12 +18,90 @@ services:
   consul:
     container_name: consul
     image: hashicorp/consul
-    network_mode: host
-  
+    ports:
+      - "8500:8500"
+
+  kafka:
+    image: apache/kafka
+    ports:
+      - "9092:9092"
+
+  # --- Databases ---
+
+  user-service-db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${USER_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${USER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${USER_SERVICE_DB}
+    volumes:
+      - user_service_db:/var/lib/postgresql/data
+
+  order-service-db:
+    image: postgres
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: ${ORDER_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${ORDER_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${ORDER_SERVICE_DB}
+    volumes:
+      - order_service_db:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+
+  # --- Services ---
+
+  user-service:
+    build: ../eshop-user-service
+    image: eshop-user-service
+    env_file: .env
+    depends_on:
+      - consul
+      - user-service-db
+    environment:
+      - CONSUL_URL=consul
+      - USER_SERVICE_DB_HOST=user-service-db
+      - USER_SERVICE_DB_PORT=5432
+
+  product-service:
+    build: ../eshop-product-service
+    image: eshop-product-service
+    env_file: .env
+    depends_on:
+      - consul
+      - mongodb
+    environment:
+      - CONSUL_URL=consul
+      - ORDER_SERVICE_QUERY_DB_HOST=mongodb
+
+  order-service:
+    build: ../eshop-order-service
+    image: eshop-order-service
+    env_file: .env
+    depends_on:
+      - consul
+      - order-service-db
+      - mongodb
+      - kafka
+    environment:
+      - CONSUL_URL=consul
+      - ORDER_SERVICE_DB_HOST=order-service-db
+      - ORDER_SERVICE_DB_PORT=5432
+      - ORDER_SERVICE_QUERY_DB_HOST=mongodb
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+
 volumes:
   user_service_db:
-  order_service_db: 
- 
-networks:
-  elastic:
-    driver: bridge
+  order_service_db:
+  mongodb_data:

@@ -23,6 +23,22 @@ A backend e-commerce platform built with a microservice architecture. Each servi
 - Fluent Bit
 - Docker
 
+## Usage
+
+**Prerequisites:** Docker and Docker Compose
+
+Create an `.env` file inside `infrastructure/` with the required variables (see each service's docs for details), then run:
+
+```bash
+cd infrastructure
+
+# Development — debug logging, no observability
+docker compose -f docker-compose-dev.yaml up
+
+# Production — full stack with observability
+docker compose up
+```
+
 ## Documentations
 
 - User microservice — [docs](./docs/user-service/README.md)
