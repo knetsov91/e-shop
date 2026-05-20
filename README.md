@@ -19,6 +19,13 @@ A backend e-commerce platform built with a microservice architecture. Each servi
 - Publish an order-created event so downstream services can react asynchronously
 - Retrieve the list of all orders (query side, CQRS)
 
+## Non-Functional Requirements
+
+### Observability
+- Prometheus metrics exposed on every service via `/actuator/prometheus`
+- Centralised log aggregation with Fluent Bit, Elasticsearch, and Kibana
+- Grafana dashboards for real-time service health and throughput monitoring
+
 ## Architecture
 
 <img src="./assets/e-shop-diagram.png" />
