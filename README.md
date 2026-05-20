@@ -2,6 +2,23 @@
 
 A backend e-commerce platform built with a microservice architecture. Each service is independently deployable, communicates via Kafka for async events, and registers itself dynamically with Traefik through Consul — no static routing configuration required.
 
+## Functional Requirements
+
+### User Service
+- Register a new user account
+- Authenticate a user and issue a session token
+- Retrieve user profile information
+
+### Product Service
+- List all available products
+- Create a new product with name, description, price, and stock quantity
+- Retrieve a single product by ID
+
+### Order Service
+- Place a new order for a product with a specified quantity
+- Publish an order-created event so downstream services can react asynchronously
+- Retrieve the list of all orders (query side, CQRS)
+
 ## Architecture
 
 <img src="./assets/e-shop-diagram.png" />
