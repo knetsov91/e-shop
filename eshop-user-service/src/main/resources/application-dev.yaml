@@ -31,6 +31,10 @@ spring:
           - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8088
         register: true
         prefer-ip-address: true
+eshop:
+  service-client:
+    secret: ${ESHOP_SERVICE_CLIENT_SECRET}
+
 server:
   port: 8088
 logging:
