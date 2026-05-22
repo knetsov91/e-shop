@@ -9,3 +9,9 @@
     <li>PostgreSQL</li>
 </ul>
 
+## Endpoints
+
+- `POST /api/v1/users/register` (Public) — Register a new user account
+- `POST /oauth2/token` (Public) — Issue a JWT access token
+- `GET /oauth2/jwks` (Public) — Public key set for JWT verification
+
