@@ -11,4 +11,6 @@
     <li>MongoDB</li>
 </ul>
 
- 
+## Endpoints
+
+- `POST /api/v1/orders` (Protected) — Place a new order, publishes event to Kafka
