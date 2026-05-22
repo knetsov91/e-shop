@@ -9,4 +9,9 @@
     <li>PostgreSQL</li>
 </ul>
 
+## Endpoints
+
+- `GET /api/v1/products` (Public) — List all products
+- `POST /api/v1/products` (Protected) — Create a new product
+
  
