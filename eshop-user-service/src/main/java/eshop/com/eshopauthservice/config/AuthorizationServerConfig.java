@@ -64,9 +64,7 @@ public class AuthorizationServerConfig {
                         .requestMatchers("/api/v1/users/register", "/actuator/health", "/actuator/prometheus").permitAll()
                         .anyRequest().authenticated()
                 )
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/v1/users/register")
-                )
+                .csrf(csrf -> csrf.disable())
                 .formLogin(Customizer.withDefaults());
 
         return http.build();
