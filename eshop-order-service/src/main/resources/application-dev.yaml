@@ -28,6 +28,12 @@ spring:
     url: jdbc:postgresql://${ORDER_SERVICE_DB_HOST}:${ORDER_SERVICE_DB_PORT}/${ORDER_SERVICE_DB}
     username: ${ORDER_SERVICE_DB_USERNAME}
     password: ${ORDER_SERVICE_DB_PASSWORD}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_SERVICE_JWK_URI}
+
   cloud:
     consul:
       host: ${CONSUL_URL:localhost}
