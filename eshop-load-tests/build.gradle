@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+    id 'io.gatling.gradle' version '3.13.1'
+}
+
+group = 'eshop.com'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    gatling 'io.gatling.highcharts:gatling-charts-highcharts:3.13.1'
+}
