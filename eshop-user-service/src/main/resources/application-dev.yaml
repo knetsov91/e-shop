@@ -29,6 +29,7 @@ spring:
           - traefik.enable=true
           - "traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/api/v1/users`) || PathPrefix(`/oauth2`)"
           - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8088
+          - traefik.http.routers.eshop-auth-service.middlewares=rate-limit@file
         register: true
         prefer-ip-address: true
 eshop:

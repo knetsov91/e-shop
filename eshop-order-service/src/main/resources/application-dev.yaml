@@ -50,6 +50,7 @@ spring:
           - traefik.enable=true
           - traefik.http.routers.eshop-order-service.rule=PathPrefix(`/api/v1/orders`)
           - traefik.http.services.eshop-order-service.loadbalancer.server.port=8082
+          - traefik.http.routers.eshop-order-service.middlewares=rate-limit@file
 
 server:
   port: 8082
