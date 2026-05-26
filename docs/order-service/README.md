@@ -7,7 +7,7 @@ Handles order creation and retrieval. Implements the CQRS pattern with PostgreSQ
 ## Tech Stack
 
 - Java 21
-- Spring Boot 3.5
+- Spring Boot 3
 - Spring Security OAuth2 Resource Server
 - PostgreSQL
 - MongoDB
