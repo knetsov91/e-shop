@@ -7,7 +7,7 @@ Serves as the Authorization Server for the platform. Handles user registration i
 ## Tech Stack
 
 - Java 21
-- Spring Boot 3.5
+- Spring Boot 3
 - Spring Security OAuth2 Authorization Server
 - PostgreSQL
 - Spring Cloud Consul
