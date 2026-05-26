@@ -27,13 +27,22 @@ spring:
         instance-id: ${spring.application.name}:${random.value}
         tags:
           - traefik.enable=true
-          - traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/api/v1/users`)
+          - "traefik.http.routers.eshop-auth-service.rule=PathPrefix(`/api/v1/users`) || PathPrefix(`/oauth2`)"
           - traefik.http.services.eshop-auth-service.loadbalancer.server.port=8088
         register: true
         prefer-ip-address: true
 eshop:
   service-client:
     secret: ${ESHOP_SERVICE_CLIENT_SECRET}
+
+bff:
+  token-uri: http://localhost:8088/oauth2/token
+  client-id: eshop-web-client
+  redirect-uri: http://localhost:8088/bff/callback
+  spa-redirect-uri: http://localhost:3000
+  cookie:
+    same-site: Lax
+    secure: false
 
 server:
   port: 8088
