@@ -4,6 +4,11 @@
 
 Handles product listing and creation. Products are stored in MongoDB. Listing is publicly accessible while creating a product requires a valid JWT token. Registers itself with Consul so Traefik can route traffic to it dynamically.
 
+## Functional Requirements
+
+- List all available products
+- Create a new product with name, description, price and stock quantity
+
 ## Tech Stack
 
 - Java 21
