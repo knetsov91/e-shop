@@ -13,6 +13,7 @@ services:
       - "8080:8080"
     volumes:
       - ./traefik/traefik-dev.yml:/etc/traefik/traefik.yml
+      - ./traefik/dynamic.yml:/etc/traefik/dynamic.yml
       - ./logs:/logs
 
   consul:
@@ -29,7 +30,7 @@ services:
   # --- Databases ---
 
   user-service-db:
-    image: postgres
+    image: postgres:16
     ports:
       - "5432:5432"
     environment:
@@ -40,7 +41,7 @@ services:
       - user_service_db:/var/lib/postgresql/data
 
   order-service-db:
-    image: postgres
+    image: postgres:16
     ports:
       - "5433:5432"
     environment:
