@@ -4,6 +4,12 @@
 
 Handles order creation and retrieval. Implements the CQRS pattern with PostgreSQL as the write store and MongoDB as the read store. On every new order a Kafka event is published so downstream services can react asynchronously. Registers itself with Consul so Traefik can route traffic to it dynamically.
 
+## Functional Requirements
+
+- Place a new order for a product with a specified quantity
+- Publish an order-created event so downstream services can react asynchronously
+- Retrieve all orders from the query side
+
 ## Tech Stack
 
 - Java 21
