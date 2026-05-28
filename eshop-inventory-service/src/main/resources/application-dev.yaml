@@ -20,6 +20,17 @@ spring:
     username: ${INVENTORY_SERVICE_DB_USERNAME}
     password: ${INVENTORY_SERVICE_DB_PASSWORD}
 
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: inventory-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
   cloud:
     consul:
       host: ${CONSUL_URL:localhost}
