@@ -19,3 +19,6 @@ spring:
     url: jdbc:postgresql://${INVENTORY_SERVICE_DB_HOST}:${INVENTORY_SERVICE_DB_PORT}/${INVENTORY_SERVICE_DB}
     username: ${INVENTORY_SERVICE_DB_USERNAME}
     password: ${INVENTORY_SERVICE_DB_PASSWORD}
+
+server:
+  port: 8086
