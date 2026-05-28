@@ -20,5 +20,20 @@ spring:
     username: ${INVENTORY_SERVICE_DB_USERNAME}
     password: ${INVENTORY_SERVICE_DB_PASSWORD}
 
+  cloud:
+    consul:
+      host: ${CONSUL_URL:localhost}
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+        health-check-path: /actuator/health
+        register: true
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${random.value}
+        tags:
+          - traefik.enable=false
+
 server:
   port: 8086
