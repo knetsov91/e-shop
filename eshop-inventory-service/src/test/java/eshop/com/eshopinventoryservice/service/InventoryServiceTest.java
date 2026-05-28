@@ -36,4 +36,18 @@ class InventoryServiceTest {
         assertThat(stock.getQuantity()).isEqualTo(7);
         verify(stockRepository).save(stock);
     }
+
+    @Test
+    void reserveStock_whenStockIsInsufficient_thenReturnsFalse() {
+        Stock stock = new Stock();
+        stock.setProductId("product-1");
+        stock.setQuantity(2);
+
+        when(stockRepository.findByProductId("product-1")).thenReturn(Optional.of(stock));
+
+        boolean result = inventoryService.reserveStock("product-1", 5);
+
+        assertThat(result).isFalse();
+        verify(stockRepository, never()).save(any());
+    }
 }
