@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,5 +50,14 @@ class InventoryServiceTest {
 
         assertThat(result).isFalse();
         verify(stockRepository, never()).save(any());
+    }
+
+    @Test
+    void reserveStock_whenProductNotFound_thenThrowsIllegalArgumentException() {
+        when(stockRepository.findByProductId("unknown")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> inventoryService.reserveStock("unknown", 1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("unknown");
     }
 }
