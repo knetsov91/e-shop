@@ -45,4 +45,22 @@ class InventoryEventConsumerTest {
 
         assertThat(order.getStatus()).isEqualTo("CONFIRMED");
     }
+
+    @Test
+    void consume_whenStatusIsInsufficient_thenUpdatesOrderToFailed() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(
+                new eshop.com.eshoporderservice.event.InventoryEvent(orderId, "product-1", "INSUFFICIENT")
+        );
+
+        OrderCommand order = new OrderCommand();
+        order.setId(orderId);
+        order.setStatus("PENDING");
+
+        when(orderCommandRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        inventoryEventConsumer.consume(message);
+
+        assertThat(order.getStatus()).isEqualTo("FAILED");
+    }
 }
