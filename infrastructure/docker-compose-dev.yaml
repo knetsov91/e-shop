@@ -51,6 +51,17 @@ services:
     volumes:
       - order_service_db:/var/lib/postgresql/data
 
+  inventory-service-db:
+    image: postgres:16
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: ${INVENTORY_SERVICE_DB_USERNAME}
+      POSTGRES_PASSWORD: ${INVENTORY_SERVICE_DB_PASSWORD}
+      POSTGRES_DB: ${INVENTORY_SERVICE_DB}
+    volumes:
+      - inventory_service_db:/var/lib/postgresql/data
+
   mongodb:
     image: mongo
     ports:
@@ -105,4 +116,5 @@ services:
 volumes:
   user_service_db:
   order_service_db:
+  inventory_service_db:
   mongodb_data:

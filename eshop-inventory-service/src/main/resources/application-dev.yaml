@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: eshop-inventory-service
+
+  config:
+    import: "optional:consul:"
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${INVENTORY_SERVICE_DB_HOST}:${INVENTORY_SERVICE_DB_PORT}/${INVENTORY_SERVICE_DB}
+    username: ${INVENTORY_SERVICE_DB_USERNAME}
+    password: ${INVENTORY_SERVICE_DB_PASSWORD}
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: inventory-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+  cloud:
+    consul:
+      host: ${CONSUL_URL:localhost}
+      port: 8500
+      config:
+        enabled: false
+      discovery:
+        enabled: true
+        health-check-path: /actuator/health
+        register: true
+        prefer-ip-address: true
+        instance-id: ${spring.application.name}:${random.value}
+        tags:
+          - traefik.enable=false
+
+server:
+  port: 8086
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
