@@ -46,4 +46,18 @@ class OrderEventConsumerTest {
 
         verify(kafkaTemplate).send(eq("inventory-events"), contains("RESERVED"));
     }
+
+    @Test
+    void consume_whenStockIsInsufficient_thenPublishesInsufficientEventToInventoryEvents() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(
+                new OrderCreatedEvent(orderId, "product-1", 10)
+        );
+
+        when(inventoryService.reserveStock("product-1", 10)).thenReturn(false);
+
+        orderEventConsumer.consume(message);
+
+        verify(kafkaTemplate).send(eq("inventory-events"), contains("INSUFFICIENT"));
+    }
 }
