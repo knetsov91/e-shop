@@ -1,5 +1,6 @@
 package eshop.com.eshoporderservice.config;
 
+import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.service.OrderCommandService;
 import eshop.com.eshoporderservice.service.OrderQueryService;
 import eshop.com.eshoporderservice.web.OrderCommandController;
@@ -11,6 +12,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -42,5 +46,16 @@ class SecurityConfigTest {
                         .contentType("application/json")
                         .content("{\"product\":\"product-1\",\"quantity\":1}"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void createOrder_whenAuthenticated_thenReturns200() throws Exception {
+        when(orderCommandService.createOrder(any())).thenReturn(new OrderCommand());
+
+        mockMvc.perform(post("/api/v1/orders")
+                        .with(jwt())
+                        .contentType("application/json")
+                        .content("{\"product\":\"product-1\",\"quantity\":1}"))
+                .andExpect(status().isOk());
     }
 }
