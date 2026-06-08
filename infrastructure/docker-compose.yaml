@@ -6,6 +6,7 @@ services:
 
   traefik:
     image: traefik:v3.4
+    restart: unless-stopped
     depends_on:
       - consul
     ports:
@@ -18,11 +19,13 @@ services:
   consul:
     container_name: consul
     image: hashicorp/consul
+    restart: unless-stopped
     ports:
       - "8500:8500"
 
   kafka:
     image: apache/kafka
+    restart: unless-stopped
     ports:
       - "9092:9092"
 
@@ -30,6 +33,7 @@ services:
 
   user-service-db:
     image: postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
@@ -41,6 +45,7 @@ services:
 
   order-service-db:
     image: postgres
+    restart: unless-stopped
     ports:
       - "5433:5432"
     environment:
@@ -52,6 +57,7 @@ services:
 
   mongodb:
     image: mongo
+    restart: unless-stopped
     ports:
       - "27017:27017"
     environment:
@@ -65,6 +71,7 @@ services:
   user-service:
     build: ../eshop-user-service
     image: eshop-user-service
+    restart: unless-stopped
     env_file: .env
     depends_on:
       - consul
@@ -77,6 +84,7 @@ services:
   product-service:
     build: ../eshop-product-service
     image: eshop-product-service
+    restart: unless-stopped
     env_file: .env
     depends_on:
       - consul
@@ -88,6 +96,7 @@ services:
   order-service:
     build: ../eshop-order-service
     image: eshop-order-service
+    restart: unless-stopped
     env_file: .env
     depends_on:
       - consul
@@ -105,6 +114,7 @@ services:
 
   prometheus:
     image: prom/prometheus
+    restart: unless-stopped
     ports:
       - "9090:9090"
     volumes:
@@ -113,6 +123,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
@@ -121,6 +132,7 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.18.2
     container_name: elasticsearch
+    restart: unless-stopped
     environment:
       - discovery.type=single-node
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
@@ -132,6 +144,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.18.2
+    restart: unless-stopped
     depends_on:
       - elasticsearch
     environment:
@@ -144,6 +157,7 @@ services:
   fluent-bit:
     image: fluent/fluent-bit
     container_name: fluent-bit
+    restart: unless-stopped
     ports:
       - "24224:24224"
       - "24224:24224/udp"
