@@ -80,3 +80,4 @@ docker compose up
 - User microservice — [docs](./docs/user-service/README.md)
 - Order microservice — [docs](./docs/order-service/README.md)
 - Product microservice — [docs](./docs/product-service/README.md)
+- Non-functional tests — [docs](./eshop-load-tests/README.md)
