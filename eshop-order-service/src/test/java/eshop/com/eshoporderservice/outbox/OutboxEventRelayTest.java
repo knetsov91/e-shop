@@ -51,4 +51,19 @@ class OutboxEventRelayTest {
         assertThat(first.isPublished()).isTrue();
         assertThat(second.isPublished()).isTrue();
     }
+
+    @Test
+    void relay_whenKafkaSendFails_thenEventRemainsUnpublished() throws Exception {
+        OutboxEvent event = new OutboxEvent();
+        event.setTopic("order-events");
+        event.setPayload("{\"id\":\"1\"}");
+
+        when(outboxEventRepository.findUnpublishedForUpdate()).thenReturn(List.of(event));
+        when(kafkaTemplate.send(anyString(), anyString()))
+                .thenReturn(CompletableFuture.failedFuture(new RuntimeException("Kafka unavailable")));
+
+        outboxEventRelay.relay();
+
+        assertThat(event.isPublished()).isFalse();
+    }
 }
