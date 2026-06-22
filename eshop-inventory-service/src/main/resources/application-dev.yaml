@@ -46,6 +46,15 @@ spring:
         tags:
           - traefik.enable=false
 
+sentry:
+  dsn: ${SENTRY_DSN}
+  traces-sample-rate: 1.0
+  logs:
+    enabled: true
+  logging:
+    minimum-event-level: warn
+    minimum-breadcrumb-level: info
+
 server:
   port: 8086
 
