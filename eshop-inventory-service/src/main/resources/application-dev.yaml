@@ -48,9 +48,8 @@ spring:
 
 sentry:
   dsn: ${SENTRY_DSN}
+  enable-tracing: true
   traces-sample-rate: 1.0
-  logs:
-    enabled: true
   logging:
     minimum-event-level: warn
     minimum-breadcrumb-level: info
