@@ -13,7 +13,7 @@ spring:
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
       host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: order-group
   jpa:
@@ -54,6 +54,15 @@ spring:
           - traefik.http.routers.eshop-order-service.rule=PathPrefix(`/api/v1/orders`)
           - traefik.http.services.eshop-order-service.loadbalancer.server.port=8082
           - traefik.http.routers.eshop-order-service.middlewares=rate-limit@file
+
+sentry:
+  dsn: ${SENTRY_DSN}
+  traces-sample-rate: 1.0
+  logs:
+    enabled: true
+  logging:
+    minimum-event-level: warn
+    minimum-breadcrumb-level: info
 
 server:
   port: 8082
