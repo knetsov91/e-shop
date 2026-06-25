@@ -23,8 +23,8 @@ A backend e-commerce platform built with a microservice architecture. Each servi
 
 ### Observability
 - Prometheus metrics exposed on every service via `/actuator/prometheus`
-- Centralised log aggregation with Fluent Bit, Elasticsearch, and Kibana
 - Grafana dashboards for real-time service health and throughput monitoring
+- Sentry for error tracking and logging — unhandled exceptions and WARN-level logs are forwarded automatically. Key business events are logged explicitly (e.g. order placed, stock reserved, product created). Each service documents its own events in its observability section.
 
 ## Architecture
 
@@ -42,9 +42,7 @@ A backend e-commerce platform built with a microservice architecture. Each servi
 - Traefik
 - Prometheus
 - Grafana
-- Elasticsearch
-- Kibana
-- Fluent Bit
+- Sentry
 - Docker
 
 ## Usage
