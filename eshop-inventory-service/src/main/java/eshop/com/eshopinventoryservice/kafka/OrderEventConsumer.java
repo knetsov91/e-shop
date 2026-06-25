@@ -53,5 +53,6 @@ public class OrderEventConsumer {
     @DltHandler
     public void handleDlt(String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         log.error("Message landed in DLT for topic {}: {}", topic, message);
+        Sentry.captureMessage("DLT message on topic " + topic + ": " + message, SentryLevel.ERROR);
     }
 }
