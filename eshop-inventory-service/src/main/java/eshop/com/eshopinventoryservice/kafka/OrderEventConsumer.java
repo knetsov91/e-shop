@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshopinventoryservice.event.InventoryEvent;
 import eshop.com.eshopinventoryservice.event.OrderCreatedEvent;
 import eshop.com.eshopinventoryservice.service.InventoryService;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -41,8 +43,10 @@ public class OrderEventConsumer {
 
         if (reserved) {
             log.info("Stock reserved for order {}, product {}", event.orderId(), event.productId());
+            Sentry.captureMessage("Stock reserved for order " + event.orderId() + ", product " + event.productId(), SentryLevel.INFO);
         } else {
             log.warn("Insufficient stock for order {}, product {}", event.orderId(), event.productId());
+            Sentry.captureMessage("Insufficient stock for order " + event.orderId() + ", product " + event.productId(), SentryLevel.WARNING);
         }
     }
 
