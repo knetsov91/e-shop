@@ -31,11 +31,11 @@ Validates incoming JWT access tokens locally using the public key fetched from t
 
 ## Observability
 
-Error tracking and event capture is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically. The following business events are captured explicitly:
+Error tracking and logging is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically. The following business events are logged explicitly:
 
-- Order placed — captured after the order is persisted
-- Order status updated to CONFIRMED or FAILED — captured after the inventory response is processed
-- Dead-letter topic message — captured as ERROR when a Kafka message exhausts all retries
+- Order placed — logged after the order is persisted
+- Order status updated to CONFIRMED or FAILED — logged after the inventory response is processed
+- Dead-letter topic message — logged as ERROR when a Kafka message exhausts all retries
 
 ## Configuration
 
@@ -51,4 +51,4 @@ The following environment variables are required to run the service:
 - `ORDER_SERVICE_QUERY_DB_PASSWORD` — MongoDB password
 - `AUTH_SERVICE_JWK_URI` — JWK endpoint of the user service for JWT verification
 - `CONSUL_URL` — Consul host for service registration and discovery
-- `SENTRY_DSN` — Sentry DSN for error tracking and event capture
+- `SENTRY_DSN` — Sentry DSN for error tracking and logging
