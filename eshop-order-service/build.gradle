@@ -1,7 +1,21 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "io.sentry.jvm.gradle" version "6.12.0"
+}
+
+sentry {
+    includeSourceContext = true
+    org = "dev-7eg"
+    projectName = "java-spring-boot-eshop"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 ext {
     springCloudVersion = "2025.0.0"
@@ -33,6 +47,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.springframework.security:spring-security-test'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

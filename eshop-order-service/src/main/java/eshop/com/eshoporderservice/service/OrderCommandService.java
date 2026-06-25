@@ -6,6 +6,8 @@ import eshop.com.eshoporderservice.event.OrderCreatedEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +33,8 @@ public class OrderCommandService {
         orderCommand.setStatus("PENDING");
 
         OrderCommand saved = orderCommandRepository.save(orderCommand);
+
+        Sentry.captureMessage("Order placed: " + saved.getId(), SentryLevel.INFO);
 
         try {
             OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getProduct(), saved.getQuantity());
