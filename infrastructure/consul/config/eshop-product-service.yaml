@@ -1,0 +1,6 @@
+sentry:
+  logging:
+    minimum-event-level: warn
+
+server:
+  port: 8084
