@@ -3,21 +3,21 @@ package eshop.com.eshoporderservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.outbox.OutboxEvent;
+import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +28,7 @@ class OrderCommandServiceTest {
     private OrderCommandRepository orderCommandRepository;
 
     @Mock
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private OutboxEventRepository outboxEventRepository;
 
     @Spy
     private ObjectMapper objectMapper;
@@ -57,7 +57,7 @@ class OrderCommandServiceTest {
     }
 
     @Test
-    void createOrder_whenValidRequest_thenPublishesEventToKafka() {
+    void createOrder_whenValidRequest_thenSavesOutboxEventWithOrderId() {
         OrderCommandCreateRequest request = new OrderCommandCreateRequest();
         request.setProduct("Laptop");
         request.setQuantity(1);
@@ -71,6 +71,9 @@ class OrderCommandServiceTest {
 
         orderCommandService.createOrder(request);
 
-        verify(kafkaTemplate).send(eq("order-events"), contains(orderId.toString()));
+        ArgumentCaptor<OutboxEvent> captor = ArgumentCaptor.forClass(OutboxEvent.class);
+        verify(outboxEventRepository).save(captor.capture());
+        assertThat(captor.getValue().getTopic()).isEqualTo("order-events");
+        assertThat(captor.getValue().getPayload()).contains(orderId.toString());
     }
 }
