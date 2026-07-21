@@ -35,3 +35,5 @@ The following environment variables are required to run the service:
 - `ORDER_SERVICE_QUERY_DB_PASSWORD` — MongoDB password
 - `AUTH_SERVICE_JWK_URI` — JWK endpoint of the user service for JWT verification
 - `CONSUL_URL` — Consul host for service registration and discovery
+
+Non-secret settings — server port, Sentry log level — are not set via environment variables but loaded from the Consul KV store at startup (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

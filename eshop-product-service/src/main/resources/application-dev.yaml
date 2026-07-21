@@ -1,6 +1,10 @@
 spring:
   application:
     name: eshop-product-service
+
+  config:
+    import: "optional:consul:"
+
   data:
     mongodb:
       username: ${ORDER_SERVICE_QUERY_DB_USERNAME}
@@ -13,7 +17,9 @@ spring:
       host: ${CONSUL_URL:localhost}
       port: 8500
       config:
-        enabled: false
+        enabled: true
+        format: yaml
+        data-key: data
       discovery:
         enabled: true
         health-check-path: /actuator/health

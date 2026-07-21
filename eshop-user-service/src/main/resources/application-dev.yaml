@@ -1,6 +1,10 @@
 spring:
   application:
     name: eshop-auth-service
+
+  config:
+    import: "optional:consul:"
+
   jpa:
     properties:
       hibernate:
@@ -19,7 +23,9 @@ spring:
       host: ${CONSUL_URL:localhost}
       port: 8500
       config:
-        enabled: false
+        enabled: true
+        format: yaml
+        data-key: data
       discovery:
         enabled: true
         health-check-path: /actuator/health
