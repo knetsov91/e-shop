@@ -17,6 +17,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -60,5 +61,19 @@ class OrderEventConsumerTest {
         orderEventConsumer.consume(message);
 
         verify(kafkaTemplate).send(eq("inventory-events"), contains("INSUFFICIENT"));
+    }
+
+    @Test
+    void consume_whenOrderAlreadyProcessed_thenSkipsPublishingToInventoryEvents() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(
+                new OrderCreatedEvent(orderId, "product-1", 3)
+        );
+
+        when(inventoryService.reserveStock(orderId, "product-1", 3)).thenReturn(ReservationOutcome.ALREADY_PROCESSED);
+
+        orderEventConsumer.consume(message);
+
+        verifyNoInteractions(kafkaTemplate);
     }
 }
