@@ -46,16 +46,18 @@ class InventoryServiceTest {
     }
 
     @Test
-    void reserveStock_whenStockIsInsufficient_thenReturnsFalse() {
+    void reserveStock_whenStockIsInsufficient_thenReturnsInsufficient() {
+        UUID orderId = UUID.randomUUID();
         Stock stock = new Stock();
         stock.setProductId("product-1");
         stock.setQuantity(2);
 
+        when(processedOrderEventRepository.existsById(orderId)).thenReturn(false);
         when(stockRepository.findByProductId("product-1")).thenReturn(Optional.of(stock));
 
-        boolean result = inventoryService.reserveStock("product-1", 5);
+        ReservationOutcome result = inventoryService.reserveStock(orderId, "product-1", 5);
 
-        assertThat(result).isFalse();
+        assertThat(result).isEqualTo(ReservationOutcome.INSUFFICIENT);
         verify(stockRepository, never()).save(any());
     }
 
