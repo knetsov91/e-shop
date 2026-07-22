@@ -55,7 +55,7 @@ class OrderEventConsumerTest {
                 new OrderCreatedEvent(orderId, "product-1", 10)
         );
 
-        when(inventoryService.reserveStock("product-1", 10)).thenReturn(false);
+        when(inventoryService.reserveStock(orderId, "product-1", 10)).thenReturn(ReservationOutcome.INSUFFICIENT);
 
         orderEventConsumer.consume(message);
 
