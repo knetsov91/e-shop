@@ -19,13 +19,27 @@ services:
   consul:
     container_name: consul
     image: hashicorp/consul
+    command: agent -server -bootstrap-expect=1 -data-dir=/consul/data -ui -client=0.0.0.0
     ports:
       - "8500:8500"
+    volumes:
+      - consul_data:/consul/data
 
   kafka:
     image: apache/kafka
     ports:
       - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
 
   # --- Databases ---
 
@@ -112,9 +126,11 @@ services:
       - ORDER_SERVICE_DB_PORT=5432
       - ORDER_SERVICE_QUERY_DB_HOST=mongodb
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - AUTH_SERVICE_JWK_URI=http://user-service:8088/oauth2/jwks
 
 volumes:
   user_service_db:
   order_service_db:
   inventory_service_db:
   mongodb_data:
+  consul_data:
