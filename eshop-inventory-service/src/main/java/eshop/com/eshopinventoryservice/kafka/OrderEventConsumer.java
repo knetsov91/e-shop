@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshopinventoryservice.event.InventoryEvent;
 import eshop.com.eshopinventoryservice.event.OrderCreatedEvent;
 import eshop.com.eshopinventoryservice.service.InventoryService;
+import eshop.com.eshopinventoryservice.service.ReservationOutcome;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -33,13 +34,18 @@ public class OrderEventConsumer {
     @KafkaListener(topics = "order-events", groupId = "inventory-group")
     public void consume(String message) throws Exception {
         OrderCreatedEvent event = objectMapper.readValue(message, OrderCreatedEvent.class);
-        boolean reserved = inventoryService.reserveStock(event.productId(), event.quantity());
+        ReservationOutcome outcome = inventoryService.reserveStock(event.orderId(), event.productId(), event.quantity());
 
-        String status = reserved ? "RESERVED" : "INSUFFICIENT";
+        if (outcome == ReservationOutcome.ALREADY_PROCESSED) {
+            log.info("Duplicate order-events message for order {}, skipping", event.orderId());
+            return;
+        }
+
+        String status = outcome == ReservationOutcome.RESERVED ? "RESERVED" : "INSUFFICIENT";
         InventoryEvent result = new InventoryEvent(event.orderId(), event.productId(), status);
         kafkaTemplate.send("inventory-events", objectMapper.writeValueAsString(result));
 
-        if (reserved) {
+        if (outcome == ReservationOutcome.RESERVED) {
             log.info("Stock reserved for order {}, product {}", event.orderId(), event.productId());
         } else {
             log.warn("Insufficient stock for order {}, product {}", event.orderId(), event.productId());

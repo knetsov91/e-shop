@@ -3,6 +3,7 @@ package eshop.com.eshopinventoryservice.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshopinventoryservice.event.OrderCreatedEvent;
 import eshop.com.eshopinventoryservice.service.InventoryService;
+import eshop.com.eshopinventoryservice.service.ReservationOutcome;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,6 +17,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,7 +42,7 @@ class OrderEventConsumerTest {
                 new OrderCreatedEvent(orderId, "product-1", 3)
         );
 
-        when(inventoryService.reserveStock("product-1", 3)).thenReturn(true);
+        when(inventoryService.reserveStock(orderId, "product-1", 3)).thenReturn(ReservationOutcome.RESERVED);
 
         orderEventConsumer.consume(message);
 
@@ -54,10 +56,24 @@ class OrderEventConsumerTest {
                 new OrderCreatedEvent(orderId, "product-1", 10)
         );
 
-        when(inventoryService.reserveStock("product-1", 10)).thenReturn(false);
+        when(inventoryService.reserveStock(orderId, "product-1", 10)).thenReturn(ReservationOutcome.INSUFFICIENT);
 
         orderEventConsumer.consume(message);
 
         verify(kafkaTemplate).send(eq("inventory-events"), contains("INSUFFICIENT"));
+    }
+
+    @Test
+    void consume_whenOrderAlreadyProcessed_thenSkipsPublishingToInventoryEvents() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(
+                new OrderCreatedEvent(orderId, "product-1", 3)
+        );
+
+        when(inventoryService.reserveStock(orderId, "product-1", 3)).thenReturn(ReservationOutcome.ALREADY_PROCESSED);
+
+        orderEventConsumer.consume(message);
+
+        verifyNoInteractions(kafkaTemplate);
     }
 }
