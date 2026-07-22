@@ -1,6 +1,7 @@
 package eshop.com.eshopinventoryservice.service;
 
 import eshop.com.eshopinventoryservice.model.Stock;
+import eshop.com.eshopinventoryservice.repository.ProcessedOrderEventRepository;
 import eshop.com.eshopinventoryservice.repository.StockRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,20 +22,25 @@ class InventoryServiceTest {
     @Mock
     private StockRepository stockRepository;
 
+    @Mock
+    private ProcessedOrderEventRepository processedOrderEventRepository;
+
     @InjectMocks
     private InventoryService inventoryService;
 
     @Test
-    void reserveStock_whenStockIsSufficient_thenDecrementsQuantityAndReturnsTrue() {
+    void reserveStock_whenStockIsSufficient_thenDecrementsQuantityAndReturnsReserved() {
+        UUID orderId = UUID.randomUUID();
         Stock stock = new Stock();
         stock.setProductId("product-1");
         stock.setQuantity(10);
 
+        when(processedOrderEventRepository.existsById(orderId)).thenReturn(false);
         when(stockRepository.findByProductId("product-1")).thenReturn(Optional.of(stock));
 
-        boolean result = inventoryService.reserveStock("product-1", 3);
+        ReservationOutcome result = inventoryService.reserveStock(orderId, "product-1", 3);
 
-        assertThat(result).isTrue();
+        assertThat(result).isEqualTo(ReservationOutcome.RESERVED);
         assertThat(stock.getQuantity()).isEqualTo(7);
         verify(stockRepository).save(stock);
     }
