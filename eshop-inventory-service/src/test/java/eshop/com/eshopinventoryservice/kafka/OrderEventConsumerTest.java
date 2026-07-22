@@ -3,6 +3,7 @@ package eshop.com.eshopinventoryservice.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshopinventoryservice.event.OrderCreatedEvent;
 import eshop.com.eshopinventoryservice.service.InventoryService;
+import eshop.com.eshopinventoryservice.service.ReservationOutcome;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -40,7 +41,7 @@ class OrderEventConsumerTest {
                 new OrderCreatedEvent(orderId, "product-1", 3)
         );
 
-        when(inventoryService.reserveStock("product-1", 3)).thenReturn(true);
+        when(inventoryService.reserveStock(orderId, "product-1", 3)).thenReturn(ReservationOutcome.RESERVED);
 
         orderEventConsumer.consume(message);
 
