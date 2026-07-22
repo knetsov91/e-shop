@@ -63,9 +63,11 @@ class InventoryServiceTest {
 
     @Test
     void reserveStock_whenProductNotFound_thenThrowsIllegalArgumentException() {
+        UUID orderId = UUID.randomUUID();
+        when(processedOrderEventRepository.existsById(orderId)).thenReturn(false);
         when(stockRepository.findByProductId("unknown")).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> inventoryService.reserveStock("unknown", 1))
+        assertThatThrownBy(() -> inventoryService.reserveStock(orderId, "unknown", 1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("unknown");
     }
