@@ -62,6 +62,17 @@ class InventoryServiceTest {
     }
 
     @Test
+    void reserveStock_whenOrderAlreadyProcessed_thenReturnsAlreadyProcessedAndSkipsStock() {
+        UUID orderId = UUID.randomUUID();
+        when(processedOrderEventRepository.existsById(orderId)).thenReturn(true);
+
+        ReservationOutcome result = inventoryService.reserveStock(orderId, "product-1", 3);
+
+        assertThat(result).isEqualTo(ReservationOutcome.ALREADY_PROCESSED);
+        verifyNoInteractions(stockRepository);
+    }
+
+    @Test
     void reserveStock_whenProductNotFound_thenThrowsIllegalArgumentException() {
         UUID orderId = UUID.randomUUID();
         when(processedOrderEventRepository.existsById(orderId)).thenReturn(false);
