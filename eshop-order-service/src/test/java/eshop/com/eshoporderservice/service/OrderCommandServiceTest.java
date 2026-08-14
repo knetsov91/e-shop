@@ -65,11 +65,13 @@ class OrderCommandServiceTest {
         OrderCommandCreateRequest request = new OrderCommandCreateRequest();
         request.setProduct("Laptop");
         request.setQuantity(1);
+        request.setAmount(BigDecimal.valueOf(499.99));
 
         UUID orderId = UUID.randomUUID();
         OrderCommand saved = new OrderCommand();
         saved.setId(orderId);
-        saved.setStatus("PENDING");
+        saved.setAmount(BigDecimal.valueOf(499.99));
+        saved.setStatus(OrderStatus.PENDING);
 
         when(orderCommandRepository.save(any(OrderCommand.class))).thenReturn(saved);
 
@@ -77,7 +79,7 @@ class OrderCommandServiceTest {
 
         ArgumentCaptor<OutboxEvent> captor = ArgumentCaptor.forClass(OutboxEvent.class);
         verify(outboxEventRepository).save(captor.capture());
-        assertThat(captor.getValue().getTopic()).isEqualTo("order-events");
+        assertThat(captor.getValue().getTopic()).isEqualTo("payment-requests");
         assertThat(captor.getValue().getPayload()).contains(orderId.toString());
     }
 }
