@@ -55,7 +55,7 @@ class SecurityConfigTest {
         mockMvc.perform(post("/api/v1/orders")
                         .with(jwt())
                         .contentType("application/json")
-                        .content("{\"product\":\"product-1\",\"quantity\":1}"))
+                        .content("{\"product\":\"product-1\",\"quantity\":1,\"amount\":19.99}"))
                 .andExpect(status().isOk());
     }
 }
