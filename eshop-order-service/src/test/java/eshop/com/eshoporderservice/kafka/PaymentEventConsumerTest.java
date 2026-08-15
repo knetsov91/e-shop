@@ -78,4 +78,17 @@ class PaymentEventConsumerTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.PAYMENT_FAILED);
         verify(outboxEventRepository, never()).save(any());
     }
+
+    @Test
+    void consume_whenOrderNotFound_thenDoesNotSave() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(new PaymentEvent(orderId, "SUCCEEDED"));
+
+        when(orderCommandRepository.findById(orderId)).thenReturn(Optional.empty());
+
+        paymentEventConsumer.consume(message);
+
+        verify(orderCommandRepository, never()).save(any());
+        verify(outboxEventRepository, never()).save(any());
+    }
 }
