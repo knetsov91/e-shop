@@ -2,13 +2,24 @@
 
 ## Overview
 
-Handles order creation and retrieval. Implements the CQRS pattern with PostgreSQL as the write store and MongoDB as the read store. On every new order a Kafka event is published so downstream services can react asynchronously. Registers itself with Consul so Traefik can route traffic to it dynamically.
+Handles order creation and retrieval. Implements the CQRS pattern with PostgreSQL as the write store and MongoDB as the read store. Owns the order saga: it triggers payment, then inventory reservation, reacting to each step's result instead of relying on services to choreograph off each other's events (see [ADR-002](../adr/002-order-saga-coordination.md)). Registers itself with Consul so Traefik can route traffic to it dynamically.
 
 ## Functional Requirements
 
-- Place a new order for a product with a specified quantity
-- Publish an order-created event so downstream services can react asynchronously
+- Place a new order for a product with a specified quantity and amount
+- Drive the order through its saga: request payment, then trigger inventory reservation once payment succeeds
 - Retrieve all orders from the query side
+
+## Saga
+
+Order status moves through `PENDING` → `AWAITING_INVENTORY` → `CONFIRMED`, or terminates early at `PAYMENT_FAILED` / `FAILED`. On order creation, order-service publishes to `payment-requests` and waits; it does not reserve stock until payment succeeds.
+
+- `payment-requests` (published) — `PaymentRequestedEvent(orderId, amount, currency)`, consumed by payment-service
+- `payment-events` (consumed) — `PaymentEvent(orderId, status)`; `SUCCEEDED` moves the order to `AWAITING_INVENTORY` and publishes `order-events` to trigger stock reservation, `FAILED` moves it to `PAYMENT_FAILED`
+- `order-events` (published) — unchanged contract, now published on payment success rather than at order creation
+- `inventory-events` (consumed) — unchanged, moves the order to `CONFIRMED` or `FAILED`
+
+Currency is hardcoded to `USD` for now — order-service has no multi-currency support yet. Refund compensation on failed stock reservation (after payment already succeeded) is not implemented yet; it's a planned follow-up on top of this.
 
 ## Tech Stack
 
