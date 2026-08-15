@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,5 +60,22 @@ class PaymentEventConsumerTest {
         verify(outboxEventRepository).save(captor.capture());
         assertThat(captor.getValue().getTopic()).isEqualTo("order-events");
         assertThat(captor.getValue().getPayload()).contains(orderId.toString());
+    }
+
+    @Test
+    void consume_whenStatusIsFailed_thenUpdatesOrderToPaymentFailed() throws Exception {
+        UUID orderId = UUID.randomUUID();
+        String message = objectMapper.writeValueAsString(new PaymentEvent(orderId, "FAILED"));
+
+        OrderCommand order = new OrderCommand();
+        order.setId(orderId);
+        order.setStatus(OrderStatus.PENDING);
+
+        when(orderCommandRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        paymentEventConsumer.consume(message);
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.PAYMENT_FAILED);
+        verify(outboxEventRepository, never()).save(any());
     }
 }
