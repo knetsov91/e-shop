@@ -87,6 +87,7 @@ docker compose up
 - **Consumers aren't idempotent outside inventory-service.** *(Pending)* `@RetryableTopic` gives at-least-once delivery, but the order-service and payment-service consumers don't dedupe redelivered messages — only inventory-service's `reserveStock` does, via `ProcessedOrderEvent`. A retry after a partial failure could double-update an order or double-publish an event.
 - **Per-user rate limiting isn't possible at the gateway.** *(Pending)* Traefik has no JWT awareness, so limiting is IP-based only. A JWT-`sub`-keyed limit would need a Redis-backed counter in each service.
 - **No integration with product-service for price.** *(Pending)* The order amount is client-supplied with no check against product-service's actual price — a security problem, since a client can send an arbitrary amount for a given product and quantity. Will be implemented.
+- **Dead-letter handling is log-only.** *(Pending)* Messages that exhaust Kafka retries land on the DLT and get logged, nothing more — no alerting, no persisted record, no replay mechanism. For payment-related consumers especially, this means a stuck message has no visibility beyond grepping logs.
 
 ## Documentations
 
