@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.event.InventoryEvent;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.DltHandler;
@@ -37,11 +39,13 @@ public class InventoryEventConsumer {
             order.setStatus(status);
             orderCommandRepository.save(order);
             log.info("Order {} status updated to {}", event.orderId(), status);
+            Sentry.captureMessage("Order " + event.orderId() + " status updated to " + status, SentryLevel.INFO);
         }, () -> log.warn("Order {} not found", event.orderId()));
     }
 
     @DltHandler
     public void handleDlt(String message, @Header(KafkaHeaders.RECEIVED_TOPIC) String topic) {
         log.error("Message landed in DLT for topic {}: {}", topic, message);
+        Sentry.captureMessage("DLT message on topic " + topic + ": " + message, SentryLevel.ERROR);
     }
 }

@@ -26,6 +26,12 @@ Handles product listing and creation. Products are stored in MongoDB. Listing is
 
 Validates incoming JWT access tokens locally using the public key fetched from the user service JWK endpoint. No request is made to the user service per request — the key is cached after the first fetch.
 
+## Observability
+
+Error tracking and logging is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically. The following business events are logged explicitly:
+
+- Product created — logged after the product is persisted
+
 ## Configuration
 
 The following environment variables are required to run the service:
@@ -35,5 +41,6 @@ The following environment variables are required to run the service:
 - `ORDER_SERVICE_QUERY_DB_PASSWORD` — MongoDB password
 - `AUTH_SERVICE_JWK_URI` — JWK endpoint of the user service for JWT verification
 - `CONSUL_URL` — Consul host for service registration and discovery
+- `SENTRY_DSN` — Sentry DSN for error tracking and logging
 
 Non-secret settings — server port, Sentry log level — are not set via environment variables but loaded from the Consul KV store at startup (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

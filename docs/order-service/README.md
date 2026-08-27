@@ -50,6 +50,14 @@ The relay uses **SELECT FOR UPDATE** to lock unpublished rows during processing.
 
 Consumers of **order-events** must be idempotent — the relay provides at-least-once delivery, meaning a message can be published more than once if the relay crashes after the Kafka send but before the transaction commits.
 
+## Observability
+
+Error tracking and logging is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically. The following business events are logged explicitly:
+
+- Order placed — logged after the order is persisted
+- Order status updated to CONFIRMED or FAILED — logged after the inventory response is processed
+- Dead-letter topic message — logged as ERROR when a Kafka message exhausts all retries
+
 ## Configuration
 
 The following environment variables are required to run the service:
@@ -64,5 +72,6 @@ The following environment variables are required to run the service:
 - `ORDER_SERVICE_QUERY_DB_PASSWORD` — MongoDB password
 - `AUTH_SERVICE_JWK_URI` — JWK endpoint of the user service for JWT verification
 - `CONSUL_URL` — Consul host for service registration and discovery
+- `SENTRY_DSN` — Sentry DSN for error tracking and logging
 
 Non-secret settings — server port, JPA/Hibernate config, Kafka consumer group, MongoDB database name, Sentry log level — are pulled from Consul KV at startup instead (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

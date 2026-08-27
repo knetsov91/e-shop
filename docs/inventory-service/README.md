@@ -12,6 +12,14 @@ Manages product stock levels. Listens for order events on Kafka and decrements s
 - Apache Kafka
 - Spring Cloud Consul
 
+## Observability
+
+Error tracking and logging is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically. The following business events are logged explicitly:
+
+- Stock reserved for an order — logged after stock is successfully decremented
+- Insufficient stock for an order — logged as WARNING when stock is too low to fulfill an order
+- Dead-letter topic message — logged as ERROR when a Kafka message exhausts all retries
+
 ## Configuration
 
 The following environment variables are required to run the service:
@@ -22,5 +30,6 @@ The following environment variables are required to run the service:
 - `INVENTORY_SERVICE_DB_USERNAME` — PostgreSQL username
 - `INVENTORY_SERVICE_DB_PASSWORD` — PostgreSQL password
 - `CONSUL_URL` — Consul host for service registration and discovery
+- `SENTRY_DSN` — Sentry DSN for error tracking and logging
 
 Non-secret settings — server port, JPA/Hibernate config, Kafka consumer/producer settings, Sentry log level — are not set via environment variables but loaded from Consul KV at startup (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

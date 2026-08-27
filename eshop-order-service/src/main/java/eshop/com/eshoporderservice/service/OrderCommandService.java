@@ -9,6 +9,8 @@ import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +42,8 @@ public class OrderCommandService {
         orderCommand.setStatus(OrderStatus.PENDING);
 
         OrderCommand saved = orderCommandRepository.save(orderCommand);
+
+        Sentry.captureMessage("Order placed: " + saved.getId(), SentryLevel.INFO);
 
         try {
             PaymentRequestedEvent event = new PaymentRequestedEvent(saved.getId(), saved.getAmount(), CURRENCY);
