@@ -2,6 +2,7 @@ package eshop.com.eshoporderservice.order.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Data
@@ -19,7 +20,11 @@ public class OrderCommand {
     @Column
     private int quantity;
 
+    @Column(nullable = false)
+    private BigDecimal amount;
+
+    @Enumerated(EnumType.STRING)
     @Column
-    private String status;
+    private OrderStatus status;
 
 }

@@ -2,6 +2,7 @@ package eshop.com.eshoporderservice.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,13 +41,13 @@ class InventoryEventConsumerTest {
 
         OrderCommand order = new OrderCommand();
         order.setId(orderId);
-        order.setStatus("PENDING");
+        order.setStatus(OrderStatus.AWAITING_INVENTORY);
 
         when(orderCommandRepository.findById(orderId)).thenReturn(Optional.of(order));
 
         inventoryEventConsumer.consume(message);
 
-        assertThat(order.getStatus()).isEqualTo("CONFIRMED");
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
     }
 
     @Test
@@ -58,13 +59,13 @@ class InventoryEventConsumerTest {
 
         OrderCommand order = new OrderCommand();
         order.setId(orderId);
-        order.setStatus("PENDING");
+        order.setStatus(OrderStatus.AWAITING_INVENTORY);
 
         when(orderCommandRepository.findById(orderId)).thenReturn(Optional.of(order));
 
         inventoryEventConsumer.consume(message);
 
-        assertThat(order.getStatus()).isEqualTo("FAILED");
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.FAILED);
     }
 
     @Test

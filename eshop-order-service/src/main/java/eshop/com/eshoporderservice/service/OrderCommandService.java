@@ -2,8 +2,9 @@ package eshop.com.eshoporderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eshop.com.eshoporderservice.event.OrderCreatedEvent;
+import eshop.com.eshoporderservice.event.PaymentRequestedEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
@@ -15,6 +16,8 @@ import java.time.LocalDateTime;
 
 @Service
 public class OrderCommandService {
+
+    private static final String CURRENCY = "USD";
 
     private final OrderCommandRepository orderCommandRepository;
     private final OutboxEventRepository outboxEventRepository;
@@ -33,20 +36,21 @@ public class OrderCommandService {
         OrderCommand orderCommand = new OrderCommand();
         orderCommand.setProduct(request.getProduct());
         orderCommand.setQuantity(request.getQuantity());
-        orderCommand.setStatus("PENDING");
+        orderCommand.setAmount(request.getAmount());
+        orderCommand.setStatus(OrderStatus.PENDING);
 
         OrderCommand saved = orderCommandRepository.save(orderCommand);
 
         try {
-            OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getProduct(), saved.getQuantity());
+            PaymentRequestedEvent event = new PaymentRequestedEvent(saved.getId(), saved.getAmount(), CURRENCY);
 
             OutboxEvent outboxEvent = new OutboxEvent();
-            outboxEvent.setTopic("order-events");
+            outboxEvent.setTopic("payment-requests");
             outboxEvent.setPayload(objectMapper.writeValueAsString(event));
             outboxEvent.setCreatedAt(LocalDateTime.now());
             outboxEventRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize order event", e);
+            throw new RuntimeException("Failed to serialize payment requested event", e);
         }
 
         return saved;
