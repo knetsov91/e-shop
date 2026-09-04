@@ -1,0 +1,4 @@
+.env
+infrastructure/.env
+infrastructure/logs/
+*.log
