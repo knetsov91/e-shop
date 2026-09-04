@@ -2,3 +2,4 @@
 infrastructure/.env
 infrastructure/logs/
 *.log
+INTERVIEW.html
