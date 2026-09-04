@@ -3,6 +3,7 @@ package eshop.com.eshoporderservice.kafka;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.event.InventoryEvent;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
@@ -34,7 +35,7 @@ public class InventoryEventConsumer {
         InventoryEvent event = objectMapper.readValue(message, InventoryEvent.class);
 
         orderCommandRepository.findById(event.orderId()).ifPresentOrElse(order -> {
-            String status = "RESERVED".equals(event.status()) ? "CONFIRMED" : "FAILED";
+            OrderStatus status = "RESERVED".equals(event.status()) ? OrderStatus.CONFIRMED : OrderStatus.FAILED;
             order.setStatus(status);
             orderCommandRepository.save(order);
             log.info("Order {} status updated to {}", event.orderId(), status);

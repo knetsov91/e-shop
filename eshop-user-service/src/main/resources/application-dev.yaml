@@ -1,6 +1,10 @@
 spring:
   application:
     name: eshop-auth-service
+
+  config:
+    import: "optional:consul:"
+
   jpa:
     properties:
       hibernate:
@@ -19,7 +23,9 @@ spring:
       host: ${CONSUL_URL:localhost}
       port: 8500
       config:
-        enabled: false
+        enabled: true
+        format: yaml
+        data-key: data
       discovery:
         enabled: true
         health-check-path: /actuator/health
@@ -47,23 +53,10 @@ bff:
 
 sentry:
   dsn: ${SENTRY_DSN}
-  enable-tracing: true
-  traces-sample-rate: 1.0
-  logging:
-    minimum-event-level: warn
-    minimum-breadcrumb-level: info
 
-server:
-  port: 8088
 logging:
   level:
     org:
       springframework:
         cloud:
           consul: DEBUG
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, httpexchanges, prometheus

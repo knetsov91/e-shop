@@ -43,3 +43,5 @@ The following environment variables are required to run the service:
 - `ESHOP_SERVICE_CLIENT_SECRET` — Secret for the service-to-service OAuth2 client
 - `CONSUL_URL` — Consul host for service registration and discovery
 - `SENTRY_DSN` — Sentry DSN for error tracking and logging
+
+Non-secret settings — server port, JPA/Hibernate config, Sentry log level, exposed Actuator endpoints (including `httpexchanges`) — are not set via environment variables but loaded from the Consul KV store at startup (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

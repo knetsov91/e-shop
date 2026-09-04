@@ -21,7 +21,6 @@ spring:
     password: ${INVENTORY_SERVICE_DB_PASSWORD}
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: inventory-group
       auto-offset-reset: earliest
@@ -36,7 +35,9 @@ spring:
       host: ${CONSUL_URL:localhost}
       port: 8500
       config:
-        enabled: false
+        enabled: true
+        format: yaml
+        data-key: data
       discovery:
         enabled: true
         health-check-path: /actuator/health
@@ -48,17 +49,3 @@ spring:
 
 sentry:
   dsn: ${SENTRY_DSN}
-  enable-tracing: true
-  traces-sample-rate: 1.0
-  logging:
-    minimum-event-level: warn
-    minimum-breadcrumb-level: info
-
-server:
-  port: 8086
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus

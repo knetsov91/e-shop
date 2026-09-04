@@ -8,20 +8,20 @@ spring:
   data:
     mongodb:
       database: orders
-      username:  ${ORDER_SERVICE_QUERY_DB_USERNAME}
+      username: ${ORDER_SERVICE_QUERY_DB_USERNAME}
       authentication-database: admin
       password: ${ORDER_SERVICE_QUERY_DB_PASSWORD}
       host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
+
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: order-group
+
   jpa:
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
         format_sql: true
     hibernate:
       ddl-auto: update
@@ -31,6 +31,7 @@ spring:
     url: jdbc:postgresql://${ORDER_SERVICE_DB_HOST}:${ORDER_SERVICE_DB_PORT}/${ORDER_SERVICE_DB}
     username: ${ORDER_SERVICE_DB_USERNAME}
     password: ${ORDER_SERVICE_DB_PASSWORD}
+
   security:
     oauth2:
       resourceserver:
@@ -42,7 +43,9 @@ spring:
       host: ${CONSUL_URL:localhost}
       port: 8500
       config:
-        enabled: false
+        enabled: true
+        format: yaml
+        data-key: data
       discovery:
         enabled: true
         health-check-path: /actuator/health
@@ -57,19 +60,3 @@ spring:
 
 sentry:
   dsn: ${SENTRY_DSN}
-  enable-tracing: true
-  traces-sample-rate: 1.0
-  logging:
-    minimum-event-level: info
-    minimum-breadcrumb-level: info
-
-server:
-  port: 8082
-
-
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
