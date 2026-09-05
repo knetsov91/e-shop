@@ -13,6 +13,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -62,5 +63,19 @@ class OrderQueryControllerTest {
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
+    void getOrderById_whenOrderExists_thenReturnsItAsJson() throws Exception {
+        when(orderQueryService.getOrderById("order-1")).thenReturn(
+                Optional.of(new OrderQuery("order-1", "product-1", 2, "CONFIRMED"))
+        );
+
+        mockMvc.perform(get("/api/v1/orders/order-1").with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.orderId").value("order-1"))
+                .andExpect(jsonPath("$.product").value("product-1"))
+                .andExpect(jsonPath("$.quantity").value(2))
+                .andExpect(jsonPath("$.status").value("CONFIRMED"));
     }
 }
