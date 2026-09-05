@@ -70,4 +70,10 @@ class SecurityConfigTest {
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void getAllOrders_whenUnauthenticated_thenReturns401() throws Exception {
+        mockMvc.perform(get("/api/v1/orders"))
+                .andExpect(status().isUnauthorized());
+    }
 }
