@@ -1,11 +1,13 @@
 package eshop.com.eshoporderservice.web;
 
 import eshop.com.eshoporderservice.order.model.OrderQuery;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.service.OrderQueryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -21,7 +23,10 @@ public class OrderQueryController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderQuery>> getAllOrders() {
+    public ResponseEntity<List<OrderQuery>> getAllOrders(@RequestParam(required = false) OrderStatus status) {
+        if (status != null) {
+            return ResponseEntity.ok(orderQueryService.getOrdersByStatus(status));
+        }
         return ResponseEntity.ok(orderQueryService.getAllOrders());
     }
 

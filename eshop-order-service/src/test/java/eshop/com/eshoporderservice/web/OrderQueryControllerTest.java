@@ -2,6 +2,7 @@ package eshop.com.eshoporderservice.web;
 
 import eshop.com.eshoporderservice.config.SecurityConfig;
 import eshop.com.eshoporderservice.order.model.OrderQuery;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.service.OrderQueryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,5 +86,18 @@ class OrderQueryControllerTest {
 
         mockMvc.perform(get("/api/v1/orders/missing-order").with(jwt()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getAllOrders_whenStatusFilterGiven_thenReturnsMatchingOrders() throws Exception {
+        when(orderQueryService.getOrdersByStatus(OrderStatus.CONFIRMED)).thenReturn(List.of(
+                new OrderQuery("order-1", "product-1", 2, "CONFIRMED")
+        ));
+
+        mockMvc.perform(get("/api/v1/orders").param("status", "CONFIRMED").with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].orderId").value("order-1"))
+                .andExpect(jsonPath("$[0].status").value("CONFIRMED"));
     }
 }

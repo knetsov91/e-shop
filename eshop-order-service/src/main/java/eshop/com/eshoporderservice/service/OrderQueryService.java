@@ -1,6 +1,7 @@
 package eshop.com.eshoporderservice.service;
 
 import eshop.com.eshoporderservice.order.model.OrderQuery;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -21,5 +22,9 @@ public class OrderQueryService {
 
     public Optional<OrderQuery> getOrderById(String orderId) {
         return orderQueryRepository.findById(orderId);
+    }
+
+    public List<OrderQuery> getOrdersByStatus(OrderStatus status) {
+        return orderQueryRepository.findByStatus(status.name());
     }
 }
