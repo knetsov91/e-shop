@@ -54,4 +54,13 @@ class OrderQueryControllerTest {
                 .andExpect(jsonPath("$[0].quantity").value(2))
                 .andExpect(jsonPath("$[0].status").value("CONFIRMED"));
     }
+
+    @Test
+    void getAllOrders_whenNoOrdersExist_thenReturnsEmptyList() throws Exception {
+        when(orderQueryService.getAllOrders()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/orders").with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
 }
