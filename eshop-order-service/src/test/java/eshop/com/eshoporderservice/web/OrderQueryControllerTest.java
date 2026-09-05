@@ -100,4 +100,10 @@ class OrderQueryControllerTest {
                 .andExpect(jsonPath("$[0].orderId").value("order-1"))
                 .andExpect(jsonPath("$[0].status").value("CONFIRMED"));
     }
+
+    @Test
+    void getAllOrders_whenStatusFilterInvalid_thenReturns400() throws Exception {
+        mockMvc.perform(get("/api/v1/orders").param("status", "BOGUS").with(jwt()))
+                .andExpect(status().isBadRequest());
+    }
 }
