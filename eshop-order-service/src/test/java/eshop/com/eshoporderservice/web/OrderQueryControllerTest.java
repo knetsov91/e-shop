@@ -78,4 +78,12 @@ class OrderQueryControllerTest {
                 .andExpect(jsonPath("$.quantity").value(2))
                 .andExpect(jsonPath("$.status").value("CONFIRMED"));
     }
+
+    @Test
+    void getOrderById_whenOrderDoesNotExist_thenReturns404() throws Exception {
+        when(orderQueryService.getOrderById("missing-order")).thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/v1/orders/missing-order").with(jwt()))
+                .andExpect(status().isNotFound());
+    }
 }
