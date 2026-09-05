@@ -75,6 +75,8 @@ docker compose up
 
 **Traefik as the API gateway.** Traefik watches Consul and builds its routing table dynamically from the tags each service registers. It handles path-based routing, load balancing across instances, and TLS termination without any static configuration. Adding or removing a service instance requires no change to the gateway.
 
+**Public API documentation (Swagger UI).** `/v3/api-docs` and `/swagger-ui/**` are permitted without authentication on user-service, order-service, and product-service, while every actual endpoint stays behind the existing JWT check — the docs only expose the API's shape (paths, request/response schemas), not data or access. This is a demo-project choice: it lets anyone browse the API without first obtaining a token. A production deployment with sensitive or internal-only routes would want to gate this behind auth or exclude those routes from the generated spec instead.
+
 **Rate limiting at the gateway.** Each service route has a token bucket rate limiter defined in Traefik's dynamic config. The bucket refills at a fixed rate and allows short bursts above it — once the bucket is empty, requests get a 429 until it refills. The limit is per client IP and per route, so hitting `/api/v1/products` doesn't affect the budget for `/api/v1/orders`. Note: Traefik has no JWT awareness, so limiting per authenticated user isn't possible at this layer. That would require either implementing it inside each service or using a Redis-backed shared counter keyed by the JWT `sub` claim, which keeps the logic centralised and consistent across all instances.
 
 ## Known Limitations / Future Work
