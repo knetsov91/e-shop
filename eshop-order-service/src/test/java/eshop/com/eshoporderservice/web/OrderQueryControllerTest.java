@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -111,5 +114,25 @@ class OrderQueryControllerTest {
     void getAllOrders_whenStatusFilterInvalid_thenReturns400() throws Exception {
         mockMvc.perform(get("/api/v1/orders").param("status", "BOGUS").with(jwt()))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void getAllOrders_whenPageParamsGiven_thenForwardsThemToService() throws Exception {
+        Page<OrderQuery> page = new PageImpl<>(
+                List.of(new OrderQuery("order-2", "product-2", 1, "PENDING")),
+                PageRequest.of(1, 1),
+                2
+        );
+        when(orderQueryService.getAllOrders(any())).thenReturn(page);
+
+        mockMvc.perform(get("/api/v1/orders").param("page", "1").param("size", "1").with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(1))
+                .andExpect(jsonPath("$.content[0].orderId").value("order-2"))
+                .andExpect(jsonPath("$.totalElements").value(2))
+                .andExpect(jsonPath("$.number").value(1))
+                .andExpect(jsonPath("$.size").value(1));
+
+        verify(orderQueryService).getAllOrders(argThat(p -> p.getPageNumber() == 1 && p.getPageSize() == 1));
     }
 }
