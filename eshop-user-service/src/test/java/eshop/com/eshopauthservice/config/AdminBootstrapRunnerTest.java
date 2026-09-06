@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -29,6 +30,18 @@ class AdminBootstrapRunnerTest {
     @Test
     void run_whenAdminAlreadyExists_thenDoesNothing() {
         when(userRepository.existsByRole(Role.ADMIN)).thenReturn(true);
+
+        adminBootstrapRunner.run(null);
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void run_whenNoAdminAndEnvVarsMissing_thenDoesNothing() {
+        when(userRepository.existsByRole(Role.ADMIN)).thenReturn(false);
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminUsername", "");
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminEmail", "");
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminPassword", "");
 
         adminBootstrapRunner.run(null);
 
