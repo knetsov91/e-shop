@@ -47,4 +47,16 @@ class AdminBootstrapRunnerTest {
 
         verify(userRepository, never()).save(any());
     }
+
+    @Test
+    void run_whenOnlyPasswordMissing_thenDoesNothing() {
+        when(userRepository.existsByRole(Role.ADMIN)).thenReturn(false);
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminUsername", "admin");
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminEmail", "admin@example.com");
+        ReflectionTestUtils.setField(adminBootstrapRunner, "adminPassword", "");
+
+        adminBootstrapRunner.run(null);
+
+        verify(userRepository, never()).save(any());
+    }
 }
