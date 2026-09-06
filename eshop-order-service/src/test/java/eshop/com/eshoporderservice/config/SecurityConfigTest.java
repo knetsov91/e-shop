@@ -13,7 +13,7 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -65,7 +65,7 @@ class SecurityConfigTest {
 
     @Test
     void getAllOrders_whenAuthenticated_thenReturns200() throws Exception {
-        when(orderQueryService.getAllOrders()).thenReturn(List.of());
+        when(orderQueryService.getAllOrders(any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk());
