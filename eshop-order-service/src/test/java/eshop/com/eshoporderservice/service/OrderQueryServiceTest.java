@@ -24,7 +24,7 @@ class OrderQueryServiceTest {
 
     @Test
     void getAllOrders_whenOrdersExist_thenReturnsAllOrders() {
-        OrderQuery order = new OrderQuery("order-1", "Laptop", 2, "PENDING");
+        OrderQuery order = new OrderQuery("order-1", "user-1", "Laptop", 2, "PENDING");
 
         when(orderQueryRepository.findAll()).thenReturn(List.of(order));
 

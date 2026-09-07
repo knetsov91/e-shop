@@ -50,7 +50,7 @@ class SecurityConfigTest {
 
     @Test
     void createOrder_whenAuthenticated_thenReturns200() throws Exception {
-        when(orderCommandService.createOrder(any())).thenReturn(new OrderCommand());
+        when(orderCommandService.createOrder(any(), any())).thenReturn(new OrderCommand());
 
         mockMvc.perform(post("/api/v1/orders")
                         .with(jwt())
