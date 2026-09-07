@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.data.domain.Page;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -65,7 +66,7 @@ class SecurityConfigTest {
 
     @Test
     void getAllOrders_whenAuthenticated_thenReturns200() throws Exception {
-        when(orderQueryService.getAllOrders(any())).thenReturn(Page.empty());
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk());

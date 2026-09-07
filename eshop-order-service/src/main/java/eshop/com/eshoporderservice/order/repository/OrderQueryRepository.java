@@ -10,4 +10,8 @@ import org.springframework.stereotype.Repository;
 public interface OrderQueryRepository extends MongoRepository<OrderQuery, String> {
 
     Page<OrderQuery> findByStatus(String status, Pageable pageable);
+
+    Page<OrderQuery> findByUserId(String userId, Pageable pageable);
+
+    Page<OrderQuery> findByUserIdAndStatus(String userId, String status, Pageable pageable);
 }

@@ -17,15 +17,19 @@ public class OrderQueryService {
         this.orderQueryRepository = orderQueryRepository;
     }
 
-    public Page<OrderQuery> getAllOrders(Pageable pageable) {
-        return orderQueryRepository.findAll(pageable);
+    public Page<OrderQuery> getOrders(String userId, boolean isAdmin, OrderStatus status, Pageable pageable) {
+        if (isAdmin) {
+            return status != null
+                    ? orderQueryRepository.findByStatus(status.name(), pageable)
+                    : orderQueryRepository.findAll(pageable);
+        }
+        return status != null
+                ? orderQueryRepository.findByUserIdAndStatus(userId, status.name(), pageable)
+                : orderQueryRepository.findByUserId(userId, pageable);
     }
 
-    public Optional<OrderQuery> getOrderById(String orderId) {
-        return orderQueryRepository.findById(orderId);
-    }
-
-    public Page<OrderQuery> getOrdersByStatus(OrderStatus status, Pageable pageable) {
-        return orderQueryRepository.findByStatus(status.name(), pageable);
+    public Optional<OrderQuery> getOrderById(String orderId, String userId, boolean isAdmin) {
+        return orderQueryRepository.findById(orderId)
+                .filter(order -> isAdmin || order.getUserId().equals(userId));
     }
 }
