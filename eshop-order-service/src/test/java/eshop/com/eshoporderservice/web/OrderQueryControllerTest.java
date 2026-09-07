@@ -50,8 +50,8 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenOrdersExist_thenReturnsThemAsJson() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(List.of(
-                new OrderQuery("order-1", "product-1", 2, "CONFIRMED"),
-                new OrderQuery("order-2", "product-2", 1, "PENDING")
+                new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED"),
+                new OrderQuery("order-2", "user-1", "product-2", 1, "PENDING")
         ));
         when(orderQueryService.getAllOrders(any())).thenReturn(page);
 
@@ -77,7 +77,7 @@ class OrderQueryControllerTest {
     @Test
     void getOrderById_whenOrderExists_thenReturnsItAsJson() throws Exception {
         when(orderQueryService.getOrderById("order-1")).thenReturn(
-                Optional.of(new OrderQuery("order-1", "product-1", 2, "CONFIRMED"))
+                Optional.of(new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED"))
         );
 
         mockMvc.perform(get("/api/v1/orders/order-1").with(jwt()))
@@ -99,7 +99,7 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenStatusFilterGiven_thenReturnsMatchingOrders() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(List.of(
-                new OrderQuery("order-1", "product-1", 2, "CONFIRMED")
+                new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED")
         ));
         when(orderQueryService.getOrdersByStatus(any(), any())).thenReturn(page);
 
@@ -119,7 +119,7 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenPageParamsGiven_thenForwardsThemToService() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(
-                List.of(new OrderQuery("order-2", "product-2", 1, "PENDING")),
+                List.of(new OrderQuery("order-2", "user-1", "product-2", 1, "PENDING")),
                 PageRequest.of(1, 1),
                 2
         );
