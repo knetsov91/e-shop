@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -137,5 +138,26 @@ class OrderQueryControllerTest {
 
         verify(orderQueryService).getOrders(any(), anyBoolean(), any(),
                 argThat(p -> p.getPageNumber() == 1 && p.getPageSize() == 1));
+    }
+
+    @Test
+    void getAllOrders_whenCallerIsAdmin_thenServiceCalledWithIsAdminTrue() throws Exception {
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/orders")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
+
+        verify(orderQueryService).getOrders(any(), eq(true), any(), any());
+    }
+
+    @Test
+    void getAllOrders_whenCallerIsNotAdmin_thenServiceCalledWithIsAdminFalseAndCallerSubject() throws Exception {
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/orders").with(jwt().jwt(builder -> builder.subject("user-1"))))
+                .andExpect(status().isOk());
+
+        verify(orderQueryService).getOrders(eq("user-1"), eq(false), any(), any());
     }
 }
