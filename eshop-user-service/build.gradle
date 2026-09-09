@@ -1,7 +1,21 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.0'
     id 'io.spring.dependency-management' version '1.1.7'
+    id "io.sentry.jvm.gradle" version "6.12.0"
+}
+
+sentry {
+    includeSourceContext = true
+    org = "dev-7eg"
+    projectName = "java-spring-boot-eshop"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 ext {
     springCloudVersion = "2025.0.0"
@@ -28,6 +42,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.security:spring-security-oauth2-authorization-server'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

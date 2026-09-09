@@ -12,6 +12,13 @@ spring:
       authentication-database: admin
       database: products
       host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_SERVICE_JWK_URI}
+
   cloud:
     consul:
       host: ${CONSUL_URL:localhost}
@@ -32,11 +39,5 @@ spring:
           - traefik.http.routers.eshop-product-service.rule=PathPrefix(`/api/v1/products`)
           - traefik.http.services.eshop-product-service.loadbalancer.server.port=8084
           - traefik.http.routers.eshop-product-service.middlewares=rate-limit@file
-server:
-  port: 8084
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
+sentry:
+  dsn: ${SENTRY_DSN}

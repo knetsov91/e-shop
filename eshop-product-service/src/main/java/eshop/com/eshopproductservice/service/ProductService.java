@@ -3,6 +3,8 @@ package eshop.com.eshopproductservice.service;
 import eshop.com.eshopproductservice.model.Product;
 import eshop.com.eshopproductservice.repository.ProductRepository;
 import eshop.com.eshopproductservice.web.dto.ProductCreateRequest;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -25,6 +27,8 @@ public class ProductService {
         product.setPrice(productCreateRequest.getPrice());
         product.setQuantity(productCreateRequest.getQuantity());
 
-        return productRepository.save(product);
+        Product saved = productRepository.save(product);
+        Sentry.captureMessage("Product created: " + saved.getId(), SentryLevel.INFO);
+        return saved;
     }
 }

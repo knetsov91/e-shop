@@ -2,12 +2,17 @@ package eshop.com.eshoporderservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import eshop.com.eshoporderservice.event.OrderCreatedEvent;
+import eshop.com.eshoporderservice.event.PaymentRequestedEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
+import eshop.com.eshoporderservice.order.model.OrderQuery;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,38 +21,51 @@ import java.time.LocalDateTime;
 @Service
 public class OrderCommandService {
 
+    private static final String CURRENCY = "USD";
+
     private final OrderCommandRepository orderCommandRepository;
+    private final OrderQueryRepository orderQueryRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
 
     public OrderCommandService(OrderCommandRepository orderCommandRepository,
+                               OrderQueryRepository orderQueryRepository,
                                OutboxEventRepository outboxEventRepository,
                                ObjectMapper objectMapper) {
         this.orderCommandRepository = orderCommandRepository;
+        this.orderQueryRepository = orderQueryRepository;
         this.outboxEventRepository = outboxEventRepository;
         this.objectMapper = objectMapper;
     }
 
     @Transactional
-    public OrderCommand createOrder(OrderCommandCreateRequest request) {
+    public OrderCommand createOrder(OrderCommandCreateRequest request, String userId) {
         OrderCommand orderCommand = new OrderCommand();
+        orderCommand.setUserId(userId);
         orderCommand.setProduct(request.getProduct());
         orderCommand.setQuantity(request.getQuantity());
-        orderCommand.setStatus("PENDING");
+        orderCommand.setAmount(request.getAmount());
+        orderCommand.setStatus(OrderStatus.PENDING);
 
         OrderCommand saved = orderCommandRepository.save(orderCommand);
 
         try {
-            OrderCreatedEvent event = new OrderCreatedEvent(saved.getId(), saved.getProduct(), saved.getQuantity());
+            PaymentRequestedEvent event = new PaymentRequestedEvent(saved.getId(), saved.getAmount(), CURRENCY);
 
             OutboxEvent outboxEvent = new OutboxEvent();
-            outboxEvent.setTopic("order-events");
+            outboxEvent.setTopic("payment-requests");
             outboxEvent.setPayload(objectMapper.writeValueAsString(event));
             outboxEvent.setCreatedAt(LocalDateTime.now());
             outboxEventRepository.save(outboxEvent);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Failed to serialize order event", e);
+            throw new RuntimeException("Failed to serialize payment requested event", e);
         }
+
+        orderQueryRepository.save(new OrderQuery(
+                saved.getId().toString(), userId, saved.getProduct(), saved.getQuantity(), saved.getStatus().name()
+        ));
+
+        Sentry.captureMessage("Order placed: " + saved.getId(), SentryLevel.INFO);
 
         return saved;
     }

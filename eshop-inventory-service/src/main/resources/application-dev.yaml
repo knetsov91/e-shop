@@ -21,7 +21,6 @@ spring:
     password: ${INVENTORY_SERVICE_DB_PASSWORD}
 
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
       group-id: inventory-group
       auto-offset-reset: earliest
@@ -48,11 +47,5 @@ spring:
         tags:
           - traefik.enable=false
 
-server:
-  port: 8086
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, prometheus
+sentry:
+  dsn: ${SENTRY_DSN}

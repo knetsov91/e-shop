@@ -27,6 +27,10 @@ Supports two OAuth2 clients:
 
 Tokens are signed with an RSA key pair generated at startup. Resource servers fetch the public key from `/oauth2/jwks` once and validate tokens locally on every request without contacting this service again.
 
+## Observability
+
+Error tracking and logging is handled by Sentry. Unhandled exceptions and all WARN-level (and above) log entries are forwarded automatically.
+
 ## Configuration
 
 The following environment variables are required to run the service:
@@ -38,5 +42,12 @@ The following environment variables are required to run the service:
 - `USER_SERVICE_DB_PASSWORD` — Database password
 - `ESHOP_SERVICE_CLIENT_SECRET` — Secret for the service-to-service OAuth2 client
 - `CONSUL_URL` — Consul host for service registration and discovery
+- `SENTRY_DSN` — Sentry DSN for error tracking and logging
+
+Optional — bootstraps the first admin account on startup if one doesn't exist yet (see [Admin account bootstrapping](../../README.md#design-decisions)):
+
+- `ADMIN_USERNAME` — Username for the initial admin account
+- `ADMIN_EMAIL` — Email for the initial admin account
+- `ADMIN_PASSWORD` — Password for the initial admin account
 
 Non-secret settings — server port, JPA/Hibernate config, Sentry log level, exposed Actuator endpoints (including `httpexchanges`) — are not set via environment variables but loaded from the Consul KV store at startup (see the root README's [Centralized configuration via Consul KV](../../README.md#design-decisions) section).

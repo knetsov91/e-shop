@@ -6,7 +6,7 @@ COPY . .
 
 RUN chmod +x ./gradlew
 
-RUN --mount=type=cache,target=/root/.gradle  ./gradlew build -x test
+RUN --mount=type=cache,target=/root/.gradle  ./gradlew build -x test -x sentryBundleSourcesJava
 
 FROM amazoncorretto:21-alpine
 
@@ -14,4 +14,6 @@ WORKDIR /app
 
 COPY --from=build /app/build/libs/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=dev"]
+ENV SPRING_PROFILES_ACTIVE=dev
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
