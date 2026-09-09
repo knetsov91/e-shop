@@ -61,7 +61,8 @@ public class AuthorizationServerConfig {
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/users/register", "/actuator/health", "/actuator/prometheus").permitAll()
+                        .requestMatchers("/api/v1/users/register", "/actuator/health", "/actuator/prometheus", "/error").permitAll()
+                        .requestMatchers("/bff/callback", "/bff/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
