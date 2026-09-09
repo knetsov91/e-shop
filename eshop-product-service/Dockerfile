@@ -7,4 +7,5 @@ RUN --mount=type=cache,target=/root/.gradle ./gradlew build -x test -x sentryBun
 FROM amazoncorretto:21-alpine
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=dev"]
+ENV SPRING_PROFILES_ACTIVE=dev
+ENTRYPOINT ["java", "-jar", "app.jar"]

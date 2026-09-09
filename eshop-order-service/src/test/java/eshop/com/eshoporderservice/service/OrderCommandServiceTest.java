@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
@@ -30,6 +31,9 @@ class OrderCommandServiceTest {
     private OrderCommandRepository orderCommandRepository;
 
     @Mock
+    private OrderQueryRepository orderQueryRepository;
+
+    @Mock
     private OutboxEventRepository outboxEventRepository;
 
     @Spy
@@ -46,6 +50,8 @@ class OrderCommandServiceTest {
         request.setAmount(BigDecimal.valueOf(999.99));
 
         OrderCommand saved = new OrderCommand();
+        saved.setId(UUID.randomUUID());
+        saved.setUserId("user-1");
         saved.setProduct("Laptop");
         saved.setQuantity(2);
         saved.setAmount(BigDecimal.valueOf(999.99));
@@ -53,11 +59,12 @@ class OrderCommandServiceTest {
 
         when(orderCommandRepository.save(any(OrderCommand.class))).thenReturn(saved);
 
-        OrderCommand result = orderCommandService.createOrder(request);
+        OrderCommand result = orderCommandService.createOrder(request, "user-1");
 
         assertThat(result.getStatus()).isEqualTo(OrderStatus.PENDING);
         assertThat(result.getProduct()).isEqualTo("Laptop");
         assertThat(result.getQuantity()).isEqualTo(2);
+        assertThat(result.getUserId()).isEqualTo("user-1");
     }
 
     @Test
@@ -75,7 +82,7 @@ class OrderCommandServiceTest {
 
         when(orderCommandRepository.save(any(OrderCommand.class))).thenReturn(saved);
 
-        orderCommandService.createOrder(request);
+        orderCommandService.createOrder(request, "user-1");
 
         ArgumentCaptor<OutboxEvent> captor = ArgumentCaptor.forClass(OutboxEvent.class);
         verify(outboxEventRepository).save(captor.capture());

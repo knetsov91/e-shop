@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.event.InventoryEvent;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
 public class InventoryEventConsumer {
 
     private final OrderCommandRepository orderCommandRepository;
+    private final OrderQueryRepository orderQueryRepository;
     private final ObjectMapper objectMapper;
 
     @RetryableTopic(
@@ -38,6 +40,10 @@ public class InventoryEventConsumer {
             OrderStatus status = "RESERVED".equals(event.status()) ? OrderStatus.CONFIRMED : OrderStatus.FAILED;
             order.setStatus(status);
             orderCommandRepository.save(order);
+            orderQueryRepository.findById(order.getId().toString()).ifPresent(orderQuery -> {
+                orderQuery.setStatus(status.name());
+                orderQueryRepository.save(orderQuery);
+            });
             log.info("Order {} status updated to {}", event.orderId(), status);
             Sentry.captureMessage("Order " + event.orderId() + " status updated to " + status, SentryLevel.INFO);
         }, () -> log.warn("Order {} not found", event.orderId()));

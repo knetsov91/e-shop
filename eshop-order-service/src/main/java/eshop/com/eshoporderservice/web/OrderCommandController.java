@@ -5,6 +5,8 @@ import eshop.com.eshoporderservice.service.OrderCommandService;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +23,9 @@ public class OrderCommandController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderCommand> createOrderCommand(@Valid @RequestBody OrderCommandCreateRequest orderCommandRequest) {
-        OrderCommand order = orderCommandService.createOrder(orderCommandRequest);
+    public ResponseEntity<OrderCommand> createOrderCommand(@Valid @RequestBody OrderCommandCreateRequest orderCommandRequest,
+                                                             @AuthenticationPrincipal Jwt jwt) {
+        OrderCommand order = orderCommandService.createOrder(orderCommandRequest, jwt.getSubject());
         return ResponseEntity.ok().body(order);
     }
 }

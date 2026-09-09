@@ -1,5 +1,6 @@
 package eshop.com.eshopauthservice.user.service;
 
+import eshop.com.eshopauthservice.user.model.Role;
 import eshop.com.eshopauthservice.user.model.User;
 import eshop.com.eshopauthservice.user.repository.UserRepository;
 import eshop.com.eshopauthservice.web.dto.RegisterRequest;
@@ -22,7 +23,8 @@ public class UserService {
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
-        user.setRole("ROLE_USER");
+        // Public registration must never be able to grant admin — that's a privilege-escalation hole.
+        user.setRole(Role.USER);
         return userRepository.save(user);
     }
 }

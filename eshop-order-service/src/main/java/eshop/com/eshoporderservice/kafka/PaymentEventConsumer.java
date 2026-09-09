@@ -7,6 +7,7 @@ import eshop.com.eshoporderservice.event.PaymentEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ import java.time.LocalDateTime;
 public class PaymentEventConsumer {
 
     private final OrderCommandRepository orderCommandRepository;
+    private final OrderQueryRepository orderQueryRepository;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
 
@@ -50,8 +52,16 @@ public class PaymentEventConsumer {
                 order.setStatus(OrderStatus.PAYMENT_FAILED);
                 orderCommandRepository.save(order);
             }
+            updateOrderQueryStatus(order.getId().toString(), order.getStatus());
             log.info("Order {} status updated to {}", event.orderId(), order.getStatus());
         }, () -> log.warn("Order {} not found", event.orderId()));
+    }
+
+    private void updateOrderQueryStatus(String orderId, OrderStatus status) {
+        orderQueryRepository.findById(orderId).ifPresent(orderQuery -> {
+            orderQuery.setStatus(status.name());
+            orderQueryRepository.save(orderQuery);
+        });
     }
 
     private void publishOrderCreatedEvent(OrderCommand order) {

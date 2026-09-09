@@ -12,6 +12,13 @@ spring:
       authentication-database: admin
       database: products
       host: ${ORDER_SERVICE_QUERY_DB_HOST:localhost}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_SERVICE_JWK_URI}
+
   cloud:
     consul:
       host: ${CONSUL_URL:localhost}
