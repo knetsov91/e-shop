@@ -15,6 +15,9 @@ public class OrderCommand {
     private UUID id;
 
     @Column
+    private String userId;
+
+    @Column
     private String product;
 
     @Column

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +26,9 @@ class InventoryEventConsumerTest {
 
     @Mock
     private OrderCommandRepository orderCommandRepository;
+
+    @Mock
+    private OrderQueryRepository orderQueryRepository;
 
     @Spy
     private ObjectMapper objectMapper;

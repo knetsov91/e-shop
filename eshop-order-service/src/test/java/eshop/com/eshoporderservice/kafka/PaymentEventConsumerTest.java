@@ -5,6 +5,7 @@ import eshop.com.eshoporderservice.event.PaymentEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
 import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,9 @@ class PaymentEventConsumerTest {
 
     @Mock
     private OrderCommandRepository orderCommandRepository;
+
+    @Mock
+    private OrderQueryRepository orderQueryRepository;
 
     @Mock
     private OutboxEventRepository outboxEventRepository;
