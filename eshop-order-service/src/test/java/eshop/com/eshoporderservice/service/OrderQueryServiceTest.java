@@ -26,15 +26,27 @@ class OrderQueryServiceTest {
     private OrderQueryService orderQueryService;
 
     @Test
-    void getAllOrders_whenOrdersExist_thenReturnsAllOrders() {
+    void getOrders_whenAdminAndNoStatusFilter_thenReturnsAllOrders() {
         OrderQuery order = new OrderQuery("order-1", "user-1", "Laptop", 2, "PENDING");
 
         when(orderQueryRepository.findAll(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(order)));
 
-        Page<OrderQuery> result = orderQueryService.getAllOrders(Pageable.unpaged());
+        Page<OrderQuery> result = orderQueryService.getOrders("admin-1", true, null, Pageable.unpaged());
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getOrderId()).isEqualTo("order-1");
         assertThat(result.getContent().get(0).getProduct()).isEqualTo("Laptop");
+    }
+
+    @Test
+    void getOrders_whenNotAdminAndNoStatusFilter_thenReturnsOnlyOwnOrders() {
+        OrderQuery order = new OrderQuery("order-1", "user-1", "Laptop", 2, "PENDING");
+
+        when(orderQueryRepository.findByUserId("user-1", Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(order)));
+
+        Page<OrderQuery> result = orderQueryService.getOrders("user-1", false, null, Pageable.unpaged());
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getUserId()).isEqualTo("user-1");
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -20,7 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -50,10 +53,10 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenOrdersExist_thenReturnsThemAsJson() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(List.of(
-                new OrderQuery("order-1", "product-1", 2, "CONFIRMED"),
-                new OrderQuery("order-2", "product-2", 1, "PENDING")
+                new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED"),
+                new OrderQuery("order-2", "user-1", "product-2", 1, "PENDING")
         ));
-        when(orderQueryService.getAllOrders(any())).thenReturn(page);
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk())
@@ -67,7 +70,7 @@ class OrderQueryControllerTest {
 
     @Test
     void getAllOrders_whenNoOrdersExist_thenReturnsEmptyList() throws Exception {
-        when(orderQueryService.getAllOrders(any())).thenReturn(Page.empty());
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/v1/orders").with(jwt()))
                 .andExpect(status().isOk())
@@ -76,8 +79,8 @@ class OrderQueryControllerTest {
 
     @Test
     void getOrderById_whenOrderExists_thenReturnsItAsJson() throws Exception {
-        when(orderQueryService.getOrderById("order-1")).thenReturn(
-                Optional.of(new OrderQuery("order-1", "product-1", 2, "CONFIRMED"))
+        when(orderQueryService.getOrderById(eq("order-1"), any(), anyBoolean())).thenReturn(
+                Optional.of(new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED"))
         );
 
         mockMvc.perform(get("/api/v1/orders/order-1").with(jwt()))
@@ -90,7 +93,7 @@ class OrderQueryControllerTest {
 
     @Test
     void getOrderById_whenOrderDoesNotExist_thenReturns404() throws Exception {
-        when(orderQueryService.getOrderById("missing-order")).thenReturn(Optional.empty());
+        when(orderQueryService.getOrderById(eq("missing-order"), any(), anyBoolean())).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/v1/orders/missing-order").with(jwt()))
                 .andExpect(status().isNotFound());
@@ -99,9 +102,9 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenStatusFilterGiven_thenReturnsMatchingOrders() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(List.of(
-                new OrderQuery("order-1", "product-1", 2, "CONFIRMED")
+                new OrderQuery("order-1", "user-1", "product-1", 2, "CONFIRMED")
         ));
-        when(orderQueryService.getOrdersByStatus(any(), any())).thenReturn(page);
+        when(orderQueryService.getOrders(any(), anyBoolean(), eq(OrderStatus.CONFIRMED), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/orders").param("status", "CONFIRMED").with(jwt()))
                 .andExpect(status().isOk())
@@ -119,11 +122,11 @@ class OrderQueryControllerTest {
     @Test
     void getAllOrders_whenPageParamsGiven_thenForwardsThemToService() throws Exception {
         Page<OrderQuery> page = new PageImpl<>(
-                List.of(new OrderQuery("order-2", "product-2", 1, "PENDING")),
+                List.of(new OrderQuery("order-2", "user-1", "product-2", 1, "PENDING")),
                 PageRequest.of(1, 1),
                 2
         );
-        when(orderQueryService.getAllOrders(any())).thenReturn(page);
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(page);
 
         mockMvc.perform(get("/api/v1/orders").param("page", "1").param("size", "1").with(jwt()))
                 .andExpect(status().isOk())
@@ -133,6 +136,28 @@ class OrderQueryControllerTest {
                 .andExpect(jsonPath("$.number").value(1))
                 .andExpect(jsonPath("$.size").value(1));
 
-        verify(orderQueryService).getAllOrders(argThat(p -> p.getPageNumber() == 1 && p.getPageSize() == 1));
+        verify(orderQueryService).getOrders(any(), anyBoolean(), any(),
+                argThat(p -> p.getPageNumber() == 1 && p.getPageSize() == 1));
+    }
+
+    @Test
+    void getAllOrders_whenCallerIsAdmin_thenServiceCalledWithIsAdminTrue() throws Exception {
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/orders")
+                        .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
+
+        verify(orderQueryService).getOrders(any(), eq(true), any(), any());
+    }
+
+    @Test
+    void getAllOrders_whenCallerIsNotAdmin_thenServiceCalledWithIsAdminFalseAndCallerSubject() throws Exception {
+        when(orderQueryService.getOrders(any(), anyBoolean(), any(), any())).thenReturn(Page.empty());
+
+        mockMvc.perform(get("/api/v1/orders").with(jwt().jwt(builder -> builder.subject("user-1"))))
+                .andExpect(status().isOk());
+
+        verify(orderQueryService).getOrders(eq("user-1"), eq(false), any(), any());
     }
 }
