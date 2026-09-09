@@ -92,3 +92,4 @@ docker compose up
 - User microservice — [docs](./docs/user-service/README.md)
 - Order microservice — [docs](./docs/order-service/README.md)
 - Product microservice — [docs](./docs/product-service/README.md)
+- Inventory microservice — [docs](./docs/inventory-service/README.md)
