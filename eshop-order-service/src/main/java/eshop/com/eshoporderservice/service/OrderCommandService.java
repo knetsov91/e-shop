@@ -49,12 +49,6 @@ public class OrderCommandService {
 
         OrderCommand saved = orderCommandRepository.save(orderCommand);
 
-        orderQueryRepository.save(new OrderQuery(
-                saved.getId().toString(), userId, saved.getProduct(), saved.getQuantity(), saved.getStatus().name()
-        ));
-
-        Sentry.captureMessage("Order placed: " + saved.getId(), SentryLevel.INFO);
-
         try {
             PaymentRequestedEvent event = new PaymentRequestedEvent(saved.getId(), saved.getAmount(), CURRENCY);
 
@@ -66,6 +60,12 @@ public class OrderCommandService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Failed to serialize payment requested event", e);
         }
+
+        orderQueryRepository.save(new OrderQuery(
+                saved.getId().toString(), userId, saved.getProduct(), saved.getQuantity(), saved.getStatus().name()
+        ));
+
+        Sentry.captureMessage("Order placed: " + saved.getId(), SentryLevel.INFO);
 
         return saved;
     }
