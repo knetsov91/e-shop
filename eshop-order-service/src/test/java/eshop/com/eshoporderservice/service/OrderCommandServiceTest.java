@@ -2,7 +2,9 @@ package eshop.com.eshoporderservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import eshop.com.eshoporderservice.outbox.OutboxEvent;
 import eshop.com.eshoporderservice.outbox.OutboxEventRepository;
 import eshop.com.eshoporderservice.web.dto.OrderCommandCreateRequest;
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +29,9 @@ class OrderCommandServiceTest {
 
     @Mock
     private OrderCommandRepository orderCommandRepository;
+
+    @Mock
+    private OrderQueryRepository orderQueryRepository;
 
     @Mock
     private OutboxEventRepository outboxEventRepository;
@@ -41,19 +47,24 @@ class OrderCommandServiceTest {
         OrderCommandCreateRequest request = new OrderCommandCreateRequest();
         request.setProduct("Laptop");
         request.setQuantity(2);
+        request.setAmount(BigDecimal.valueOf(999.99));
 
         OrderCommand saved = new OrderCommand();
+        saved.setId(UUID.randomUUID());
+        saved.setUserId("user-1");
         saved.setProduct("Laptop");
         saved.setQuantity(2);
-        saved.setStatus("PENDING");
+        saved.setAmount(BigDecimal.valueOf(999.99));
+        saved.setStatus(OrderStatus.PENDING);
 
         when(orderCommandRepository.save(any(OrderCommand.class))).thenReturn(saved);
 
-        OrderCommand result = orderCommandService.createOrder(request);
+        OrderCommand result = orderCommandService.createOrder(request, "user-1");
 
-        assertThat(result.getStatus()).isEqualTo("PENDING");
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.PENDING);
         assertThat(result.getProduct()).isEqualTo("Laptop");
         assertThat(result.getQuantity()).isEqualTo(2);
+        assertThat(result.getUserId()).isEqualTo("user-1");
     }
 
     @Test
@@ -61,19 +72,21 @@ class OrderCommandServiceTest {
         OrderCommandCreateRequest request = new OrderCommandCreateRequest();
         request.setProduct("Laptop");
         request.setQuantity(1);
+        request.setAmount(BigDecimal.valueOf(499.99));
 
         UUID orderId = UUID.randomUUID();
         OrderCommand saved = new OrderCommand();
         saved.setId(orderId);
-        saved.setStatus("PENDING");
+        saved.setAmount(BigDecimal.valueOf(499.99));
+        saved.setStatus(OrderStatus.PENDING);
 
         when(orderCommandRepository.save(any(OrderCommand.class))).thenReturn(saved);
 
-        orderCommandService.createOrder(request);
+        orderCommandService.createOrder(request, "user-1");
 
         ArgumentCaptor<OutboxEvent> captor = ArgumentCaptor.forClass(OutboxEvent.class);
         verify(outboxEventRepository).save(captor.capture());
-        assertThat(captor.getValue().getTopic()).isEqualTo("order-events");
+        assertThat(captor.getValue().getTopic()).isEqualTo("payment-requests");
         assertThat(captor.getValue().getPayload()).contains(orderId.toString());
     }
 }

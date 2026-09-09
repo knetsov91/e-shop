@@ -110,6 +110,7 @@ services:
     environment:
       - CONSUL_URL=consul
       - ORDER_SERVICE_QUERY_DB_HOST=mongodb
+      - AUTH_SERVICE_JWK_URI=http://user-service:8088/oauth2/jwks
 
   order-service:
     build: ../eshop-order-service
