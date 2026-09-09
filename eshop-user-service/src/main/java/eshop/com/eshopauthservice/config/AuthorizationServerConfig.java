@@ -62,6 +62,7 @@ public class AuthorizationServerConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/users/register", "/actuator/health", "/actuator/prometheus", "/error").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers("/bff/callback", "/bff/api/**").permitAll()
                         .anyRequest().authenticated()
                 )
