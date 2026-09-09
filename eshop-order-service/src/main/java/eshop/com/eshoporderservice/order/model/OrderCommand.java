@@ -14,7 +14,7 @@ public class OrderCommand {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column
     private String userId;
 
     @Column
