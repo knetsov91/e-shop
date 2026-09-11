@@ -3,7 +3,9 @@ package eshop.com.eshoporderservice.kafka;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eshop.com.eshoporderservice.event.InventoryEvent;
 import eshop.com.eshoporderservice.order.model.OrderCommand;
+import eshop.com.eshoporderservice.order.model.OrderStatus;
 import eshop.com.eshoporderservice.order.repository.OrderCommandRepository;
+import eshop.com.eshoporderservice.order.repository.OrderQueryRepository;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -11,11 +13,13 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
@@ -33,7 +37,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.config.import=optional:consul:",
         "spring.cloud.consul.enabled=false",
         "spring.cloud.consul.discovery.enabled=false",
-        "spring.cloud.consul.config.enabled=false"
+        "spring.cloud.consul.config.enabled=false",
+        "sentry.dsn="
 })
 class InventoryEventConsumerIT {
 
@@ -56,6 +61,9 @@ class InventoryEventConsumerIT {
     @Autowired
     private OrderCommandRepository orderCommandRepository;
 
+    @MockitoBean
+    private OrderQueryRepository orderQueryRepository;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -64,7 +72,8 @@ class InventoryEventConsumerIT {
         OrderCommand order = new OrderCommand();
         order.setProduct("product-1");
         order.setQuantity(3);
-        order.setStatus("PENDING");
+        order.setAmount(BigDecimal.valueOf(99.99));
+        order.setStatus(OrderStatus.PENDING);
         order = orderCommandRepository.save(order);
 
         InventoryEvent event = new InventoryEvent(order.getId(), "product-1", "RESERVED");
@@ -80,11 +89,11 @@ class InventoryEventConsumerIT {
         }
 
         UUID orderId = order.getId();
-        OrderCommand updated = pollForStatus(orderId, "CONFIRMED", Duration.ofSeconds(15));
-        assertThat(updated.getStatus()).isEqualTo("CONFIRMED");
+        OrderCommand updated = pollForStatus(orderId, OrderStatus.CONFIRMED, Duration.ofSeconds(15));
+        assertThat(updated.getStatus()).isEqualTo(OrderStatus.CONFIRMED);
     }
 
-    private OrderCommand pollForStatus(UUID orderId, String expectedStatus, Duration timeout) throws InterruptedException {
+    private OrderCommand pollForStatus(UUID orderId, OrderStatus expectedStatus, Duration timeout) throws InterruptedException {
         long deadline = System.currentTimeMillis() + timeout.toMillis();
         while (System.currentTimeMillis() < deadline) {
             Optional<OrderCommand> found = orderCommandRepository.findById(orderId);

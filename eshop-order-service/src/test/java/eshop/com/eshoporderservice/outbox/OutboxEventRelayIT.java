@@ -29,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.config.import=optional:consul:",
         "spring.cloud.consul.enabled=false",
         "spring.cloud.consul.discovery.enabled=false",
-        "spring.cloud.consul.config.enabled=false"
+        "spring.cloud.consul.config.enabled=false",
+        "sentry.dsn="
 })
 class OutboxEventRelayIT {
 
